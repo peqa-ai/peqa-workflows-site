@@ -2,7 +2,8 @@
 // Replaces Starlight's Hero on the splash landings: the headline, one sentence and the actions
 // from the page's frontmatter and, on pages with `install: true`, the install commands of the
 // latest release beside them (tabs per client). Starlight's 404 page also uses this hero.
-import { Code, LinkButton, TabItem, Tabs } from '@astrojs/starlight/components';
+import { LinkButton, TabItem, Tabs } from '@astrojs/starlight/components';
+import InstallCommand from './InstallCommand.astro';
 import { release } from '../lib/release';
 
 const { data } = Astro.locals.starlightRoute.entry;
@@ -10,6 +11,7 @@ const { title = data.title, tagline, actions = [] } = data.hero ?? {};
 const clients = data.install ? [release.install.claudeCode, release.install.codex] : [];
 ---
 
+<div class="hero-frame">
 <div class="hero">
 	<div class="lead">
 		<h1 id="_top" data-page-title set:html={title} />
@@ -32,7 +34,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 			{
 				clients.map((client) => (
 					<TabItem label={client.name}>
-						<Code code={client.command} lang="sh" frame="code" locale={Astro.locals.starlightRoute.lang} />
+						{client.command.split('\n').map((command, index) => <InstallCommand {command} number={index + 1} />)}
 						<p class="then">
 							{Astro.locals.t('peqa.install.then')} <code>{client.invoke}</code>
 						</p>
@@ -42,6 +44,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		</Tabs>
 	</section>
 	)}
+</div>
 </div>
 
 <style>
@@ -133,8 +136,12 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		border: var(--border-width) solid var(--color-code-border);
 		overflow-wrap: anywhere;
 	}
+	/* The hero's width decides its columns, in its own em, so text at 200 % stacks them. */
+	.hero-frame {
+		container: hero / inline-size;
+	}
 	/* Token --breakpoint-hero: headline and install commands side by side. */
-	@media (min-width: 64rem) {
+	@container hero (min-width: 60em) {
 		.hero {
 			grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
 			align-items: center;

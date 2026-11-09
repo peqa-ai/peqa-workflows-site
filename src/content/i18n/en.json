@@ -6,5 +6,10 @@
 	"peqa.language.lang": "es",
 	"expressiveCode.copyButtonTooltip": "Copy to clipboard",
 	"expressiveCode.copyButtonCopied": "Copied!",
-	"expressiveCode.terminalWindowFallbackTitle": "Terminal window"
+	"expressiveCode.terminalWindowFallbackTitle": "Terminal window",
+	"peqa.install.command": "Command",
+	"peqa.install.copy": "Copy",
+	"peqa.install.copyCommand": "Copy command",
+	"peqa.install.copied": "Copied",
+	"peqa.install.copyFailed": "Could not copy. Select the command and copy it manually."
 }

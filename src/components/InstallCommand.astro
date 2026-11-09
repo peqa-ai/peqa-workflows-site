@@ -1,0 +1,116 @@
+---
+// One install command with its copy button, ported from peqa.ai's InstallCommand (website
+// src/components/InstallCommand.js). Each argument wraps whole, so a narrow screen or larger
+// text moves «peqa-workflows@peqa» to the next line instead of cutting it or breaking it at a
+// hyphen; the button copies the command exactly as the README publishes it.
+interface Props {
+	command: string;
+	number: number;
+}
+
+const { command, number } = Astro.props;
+const { t } = Astro.locals;
+const label = `${t('peqa.install.command')} ${number}`;
+---
+
+<div class="command">
+	<div class="header">
+		<span>{label}</span>
+		<button class="copy" type="button" data-command={command} aria-label={`${t('peqa.install.copyCommand')} ${number}`}>
+			{t('peqa.install.copy')}
+		</button>
+	</div>
+	<pre tabindex="0" aria-label={label}><code>{command.split(' ').map((part, index) => <>{index > 0 ? ' ' : ''}<span class="argument">{part}</span></>)}</code></pre>
+	<p class="status" role="status" data-copied={t('peqa.install.copied')} data-failed={t('peqa.install.copyFailed')}></p>
+</div>
+
+<script>
+	for (const button of document.querySelectorAll<HTMLButtonElement>('.command .copy')) {
+		button.addEventListener('click', async () => {
+			const status = button.closest('.command')?.querySelector<HTMLElement>('.status');
+			if (!status) return;
+			try {
+				await navigator.clipboard.writeText(button.dataset.command ?? '');
+				status.textContent = status.dataset.copied ?? '';
+			} catch {
+				status.textContent = status.dataset.failed ?? '';
+			}
+		});
+	}
+</script>
+
+<style>
+	.command {
+		display: grid;
+		gap: var(--space-2);
+		min-width: 0;
+	}
+	.header {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+		gap: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+	}
+	/* A text button, as peqa.ai's: mono, underlined in the accent, full touch height. */
+	.copy {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--touch-target);
+		padding: 0;
+		border: 0;
+		background: none;
+		cursor: pointer;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--color-text);
+		text-decoration: underline;
+		text-decoration-color: var(--color-accent);
+		text-underline-offset: var(--space-2);
+		transition: color var(--motion-duration) var(--motion-ease);
+	}
+	.copy:hover {
+		color: var(--color-accent);
+	}
+	.copy:active {
+		opacity: var(--press-opacity);
+	}
+	.copy:focus-visible {
+		outline-offset: var(--focus-offset);
+	}
+	pre {
+		margin: 0;
+		padding: var(--space-3) var(--space-4);
+		background: var(--color-code-bg);
+		border: var(--border-width) solid var(--color-code-border);
+		white-space: pre-wrap;
+	}
+	pre:focus-visible {
+		outline-offset: var(--focus-width);
+	}
+	code {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		line-height: var(--leading-body);
+		color: var(--color-text);
+	}
+	/* An argument breaks only when it alone is wider than the line. */
+	.argument {
+		display: inline-block;
+		max-width: 100%;
+		white-space: normal;
+		overflow-wrap: anywhere;
+		vertical-align: top;
+	}
+	.status {
+		margin: 0;
+		font-size: var(--text-xs);
+		color: var(--color-text-muted);
+	}
+	.status:empty {
+		display: none;
+	}
+</style>

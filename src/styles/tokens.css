@@ -70,16 +70,25 @@
 	--brand-caret-width: 0.0923em;
 	--brand-caret-height: 0.4em;
 	--brand-caret-gap: 0.0615em;
-	--brand-caret-bottom: 0.17em;
+	/* The caret sits inline after the last glyph, its foot just under the baseline: peqa.ai
+	   lifts it 0.17em above the 0.24em mask below the glyphs. */
+	--brand-caret-baseline: -0.07em;
+	/* A logotype is exempt from text resizing (WCAG 1.4.4): as peqa.ai's min(14rem, 17vw), the
+	   signature stops growing with the text once it would no longer fit a phone's header. */
+	--brand-max-size: 6vw;
 
 	/* Ledger: mono key column beside its value. peqa.ai uses 9rem for 0.8rem keys; here the key
 	   is the skill's name at 1rem, so the column fits «memoria-guardar» (15 characters). */
 	--ledger-key-width: 11rem;
 	/* Below this ledger width the key goes above its value (repeated in @container). */
 	--ledger-stack-width: 24rem;
-	/* From this width the landing puts the install commands beside the headline (repeated in
-	   @media): the 51-character install line needs about half of it. Source: the commands. */
-	--breakpoint-hero: 64rem;
+	/* From this hero width the landing puts the install commands beside the headline (repeated
+	   in @container). In em of the hero, so larger text returns to one column: the 51-character
+	   install line needs about half of it. Source: the commands. */
+	--breakpoint-hero: 60em;
+	/* Diagrams shrink to the column down to this share of their natural size (labels stay at
+	   12 px or more at the default 16 px text), then scroll sideways. Source: legible labels. */
+	--diagram-min-scale: 0.75;
 	/* Starlight's own breakpoint for the larger nav and headings (repeated in @media). */
 	--breakpoint-nav: 50em;
 

@@ -32,15 +32,37 @@ h1#_top,
 	max-width: var(--measure);
 }
 
-/* Diagrams: their natural size at most (Mermaid's inline max-width), the column's width on
-   narrow screens. */
+/* Diagrams: their natural size at most, shrunk to the column down to --diagram-min-scale and
+   sized in em so larger text enlarges them; past that the figure scrolls sideways. Shadows at
+   the edges appear only while there is more diagram to scroll to (local backgrounds cover them
+   at either end). */
 .diagram {
 	margin-inline: 0;
+	overflow-x: auto;
+	background:
+		linear-gradient(to right, var(--color-surface), transparent) left / var(--space-6) 100% no-repeat local,
+		linear-gradient(to left, var(--color-surface), transparent) right / var(--space-6) 100% no-repeat local,
+		radial-gradient(farthest-side at 0 50%, var(--color-border-strong), transparent) left / var(--space-3) 100% no-repeat scroll,
+		radial-gradient(farthest-side at 100% 50%, var(--color-border-strong), transparent) right / var(--space-3) 100% no-repeat scroll;
+}
+.diagram:focus-visible {
+	outline-offset: var(--focus-width);
 }
 .diagram > svg {
 	display: block;
-	width: 100%;
+	width: clamp(
+		calc(var(--diagram-width) * var(--diagram-min-scale) * 1em / 16),
+		100%,
+		calc(var(--diagram-width) * 1em / 16)
+	);
+	max-width: none;
 	height: auto;
+}
+
+/* Expressive Code's copy button is dimmed until hover; keyboard focus shows it in full, so its
+   focus ring keeps the accent's contrast. */
+.expressive-code .copy button:focus-visible {
+	opacity: 1;
 }
 
 /* Starlight's LinkButton as peqa.ai's call to action: square, mono, full touch height. */

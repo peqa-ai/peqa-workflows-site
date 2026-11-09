@@ -25,7 +25,7 @@ describe('tokens', () => {
 });
 
 describe('rehypeMermaidA11y', () => {
-	const svg = (properties) => ({ type: 'element', tagName: 'svg', properties: { id: 'mermaid-0', style: 'max-width: 905.1px;', ...properties }, children: [] });
+	const svg = (properties) => ({ type: 'element', tagName: 'svg', properties: { id: 'mermaid-0', style: 'max-width: 905.1px;', viewBox: '0 0 905.1 562.4', ...properties }, children: [] });
 
 	test('reads the diagram as one named image inside a figure', () => {
 		const diagram = svg({ role: 'graphics-document document', ariaRoleDescription: 'flowchart-v2', ariaLabelledBy: 'chart-title-mermaid-0', ariaDescribedBy: 'chart-desc-mermaid-0' });
@@ -38,6 +38,21 @@ describe('rehypeMermaidA11y', () => {
 		assert.equal(diagram.properties.ariaRoleDescription, undefined);
 		assert.equal(diagram.properties.ariaLabelledBy, 'chart-title-mermaid-0');
 		assert.equal(diagram.properties.ariaDescribedBy, 'chart-desc-mermaid-0');
+	});
+
+	test('sizes the diagram from its viewBox and lets a keyboard scroll its figure', () => {
+		const diagram = svg({ ariaLabelledBy: 'chart-title-mermaid-0', ariaDescribedBy: 'chart-desc-mermaid-0' });
+		const tree = { type: 'root', children: [diagram] };
+		rehypeMermaidA11y()(tree, { path: 'x.md' });
+		const [figure] = tree.children;
+		assert.equal(diagram.properties.style, '--diagram-width:906');
+		assert.equal(figure.properties.tabIndex, 0);
+		assert.equal(figure.properties.ariaLabelledBy, 'chart-title-mermaid-0');
+	});
+
+	test('fails when a diagram has no viewBox', () => {
+		const tree = { type: 'root', children: [svg({ viewBox: undefined, ariaLabelledBy: 'chart-title-mermaid-0', ariaDescribedBy: 'chart-desc-mermaid-0' })] };
+		assert.throws(() => rehypeMermaidA11y()(tree, { path: 'x.md' }), /viewBox/);
 	});
 
 	test('fails when a diagram has no accTitle or accDescr', () => {

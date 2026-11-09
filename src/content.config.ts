@@ -16,6 +16,11 @@ export const collections = {
 			extend: z.object({
 				'peqa.install.title': z.string(),
 				'peqa.install.then': z.string(),
+				'peqa.install.command': z.string(),
+				'peqa.install.copy': z.string(),
+				'peqa.install.copyCommand': z.string(),
+				'peqa.install.copied': z.string(),
+				'peqa.install.copyFailed': z.string(),
 				'peqa.language.label': z.string(),
 				'peqa.language.href': z.string(),
 				'peqa.language.lang': z.string(),

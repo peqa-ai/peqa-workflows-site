@@ -34,7 +34,9 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 			{
 				clients.map((client) => (
 					<TabItem label={client.name}>
-						{client.command.split('\n').map((command, index) => <InstallCommand {command} number={index + 1} />)}
+						<div class="commands">
+							{client.command.split('\n').map((command, index) => <InstallCommand {command} number={index + 1} />)}
+						</div>
 						<p class="then">
 							{Astro.locals.t('peqa.install.then')} <code>{client.invoke}</code>
 						</p>
@@ -117,6 +119,11 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		letter-spacing: normal;
 		line-height: var(--leading-body);
 		color: var(--color-text);
+	}
+	/* More space between two commands than between a command's label and its block. */
+	.commands {
+		display: grid;
+		gap: var(--space-5);
 	}
 	.then {
 		margin-top: var(--space-3);

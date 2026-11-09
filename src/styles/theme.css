@@ -33,17 +33,18 @@ h1#_top,
 }
 
 /* Diagrams: their natural size at most, shrunk to the column down to --diagram-min-scale and
-   sized in em so larger text enlarges them; past that the figure scrolls sideways. Shadows at
-   the edges appear only while there is more diagram to scroll to (local backgrounds cover them
-   at either end). */
+   sized in rem so larger text enlarges them (Mermaid fixes the SVG's own font-size at 16px, so
+   em would not follow the page); past that the figure scrolls sideways and the hint below it
+   shows. Shadows at the edges appear only while there is more diagram to scroll to (local
+   backgrounds cover them at either end). */
 .diagram {
 	margin-inline: 0;
 	overflow-x: auto;
 	background:
 		linear-gradient(to right, var(--color-surface), transparent) left / var(--space-6) 100% no-repeat local,
 		linear-gradient(to left, var(--color-surface), transparent) right / var(--space-6) 100% no-repeat local,
-		radial-gradient(farthest-side at 0 50%, var(--color-border-strong), transparent) left / var(--space-3) 100% no-repeat scroll,
-		radial-gradient(farthest-side at 100% 50%, var(--color-border-strong), transparent) right / var(--space-3) 100% no-repeat scroll;
+		radial-gradient(farthest-side at 0 50%, var(--color-border), transparent) left / var(--space-3) 100% no-repeat scroll,
+		radial-gradient(farthest-side at 100% 50%, var(--color-border), transparent) right / var(--space-3) 100% no-repeat scroll;
 }
 .diagram:focus-visible {
 	outline-offset: var(--focus-width);
@@ -51,12 +52,18 @@ h1#_top,
 .diagram > svg {
 	display: block;
 	width: clamp(
-		calc(var(--diagram-width) * var(--diagram-min-scale) * 1em / 16),
+		calc(var(--diagram-width) * var(--diagram-min-scale) * 1rem / 16),
 		100%,
-		calc(var(--diagram-width) * 1em / 16)
+		calc(var(--diagram-width) * 1rem / 16)
 	);
 	max-width: none;
 	height: auto;
+}
+
+.diagram-hint {
+	margin-top: var(--space-2);
+	font-size: var(--text-xs);
+	color: var(--color-text-muted);
 }
 
 /* Expressive Code's copy button is dimmed until hover; keyboard focus shows it in full, so its
@@ -68,6 +75,7 @@ h1#_top,
 /* Starlight's LinkButton as peqa.ai's call to action: square, mono, full touch height. */
 .sl-link-button {
 	justify-content: center;
+	text-align: center;
 	min-height: var(--touch-target);
 	padding: var(--space-3) var(--space-5);
 	border-radius: var(--radius);
@@ -109,7 +117,7 @@ h1#_top,
 		site-search button[data-open-modal],
 		site-search button > kbd,
 		site-search dialog,
-		starlight-menu-button button,
+		.sl-menu-button,
 		mobile-starlight-toc .toggle,
 		.sidebar-content a,
 		.pagination-links a,
@@ -118,6 +126,20 @@ h1#_top,
 	) {
 	border-radius: var(--radius);
 }
+/* The phone menu button: square and outlined like «Ver en GitHub», not a filled circle. */
+.sl-menu-button {
+	background-color: var(--color-surface);
+	color: var(--color-text);
+	border: var(--border-width) solid var(--color-border-strong);
+	box-shadow: none;
+}
+.sl-menu-button:hover {
+	border-color: var(--color-text);
+}
+.sl-menu-button:has(~ :popover-open) {
+	background-color: var(--color-code-bg);
+}
+
 #starlight__search {
 	--sl-search-corners: var(--radius);
 	--pagefind-ui-border-radius: var(--radius);

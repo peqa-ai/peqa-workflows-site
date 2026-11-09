@@ -48,6 +48,9 @@ describe('rehypeMermaidA11y', () => {
 		assert.equal(diagram.properties.style, '--diagram-width:906');
 		assert.equal(figure.properties.tabIndex, 0);
 		assert.equal(figure.properties.ariaLabelledBy, 'chart-title-mermaid-0');
+		const [, hint] = tree.children;
+		assert.deepEqual(hint.properties.className, ['diagram-hint', 'not-content']);
+		assert.equal(hint.properties.hidden, true);
 	});
 
 	test('fails when a diagram has no viewBox', () => {

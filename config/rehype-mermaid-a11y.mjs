@@ -9,7 +9,8 @@
 // max-width is replaced by --diagram-width, the natural width from the viewBox, so theme.css can
 // shrink the diagram to the column only down to --diagram-min-scale and size it in em: larger
 // text enlarges the labels too. The figure is focusable and named by the diagram's title, so a
-// keyboard can scroll it.
+// keyboard can scroll it. A hint follows it, hidden until the figure actually overflows
+// (astro.config.mjs adds the few lines that check, on load and on resize).
 const isMermaidSvg = (node, prefix) =>
 	node.type === 'element' && node.tagName === 'svg' && String(node.properties?.id ?? '').startsWith(`${prefix}-`);
 
@@ -48,7 +49,13 @@ export function rehypeMermaidA11y({ prefix = 'mermaid' } = {}) {
 				properties: { className: ['diagram', 'not-content'], tabIndex: 0, ariaLabelledBy: labelledBy },
 				children: [node],
 			};
-			parent.children[parent.children.indexOf(node)] = figure;
+			const hint = {
+				type: 'element',
+				tagName: 'p',
+				properties: { className: ['diagram-hint', 'not-content'], hidden: true },
+				children: [{ type: 'text', value: 'Desliza o usa las flechas para ver el resto del diagrama.' }],
+			};
+			parent.children.splice(parent.children.indexOf(node), 1, figure, hint);
 		});
 	};
 }

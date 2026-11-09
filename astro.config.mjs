@@ -25,6 +25,20 @@ const fontFaces = [
 	)
 	.join('');
 
+const diagramHintScript = `
+const figures = document.querySelectorAll('figure.diagram');
+const sync = () => {
+	for (const figure of figures) {
+		const hint = figure.nextElementSibling;
+		if (hint?.classList.contains('diagram-hint')) hint.hidden = figure.scrollWidth <= figure.clientWidth + 1;
+	}
+};
+if (figures.length) {
+	sync();
+	new ResizeObserver(sync).observe(document.body);
+}
+`;
+
 // Mermaid renders at build time in Chromium, so it needs concrete values: read them from the tokens.
 const token = loadTokens();
 const px = (rem) => `${parseFloat(rem) * 16}px`;
@@ -84,6 +98,13 @@ export default defineConfig({
 					attrs: { rel: 'preload', href: `${fontBase}/NeueMachina-Ultrabold.otf`, as: 'font', type: 'font/otf', crossorigin: 'anonymous' },
 				},
 				{ tag: 'style', content: fontFaces },
+				// Shows a diagram's scroll hint (config/rehype-mermaid-a11y.mjs) only while the figure is
+				// narrower than its diagram: on load and whenever the page width or text size changes.
+				{
+					tag: 'script',
+					attrs: { type: 'module' },
+					content: diagramHintScript,
+				},
 			],
 			social: [{ icon: 'github', label: 'GitHub', href: REPO_URL }],
 			customCss: ['./src/styles/tokens.css', './src/styles/theme.css'],

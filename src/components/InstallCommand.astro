@@ -45,11 +45,13 @@ const label = `${t('peqa.install.command')} ${number}`;
 		gap: var(--space-2);
 		min-width: 0;
 	}
+	/* The label sits at the foot of the header, next to its own block; the copy button's touch
+	   area extends upward. */
 	.header {
 		display: flex;
 		flex-wrap: wrap;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-end;
 		gap: var(--space-2);
 		font-family: var(--font-mono);
 		font-size: var(--text-xs);
@@ -58,7 +60,7 @@ const label = `${t('peqa.install.command')} ${number}`;
 	/* A text button, as peqa.ai's: mono, underlined in the accent, full touch height. */
 	.copy {
 		display: inline-flex;
-		align-items: center;
+		align-items: flex-end;
 		min-height: var(--touch-target);
 		padding: 0;
 		border: 0;

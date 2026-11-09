@@ -1,0 +1,75 @@
+---
+// One skill's figure in «Qué le puedes pedir» (src/data/skill-figures.mjs): a short story
+// without text. Its steps follow the scroll, forward and back, where the browser has scroll
+// timelines, and play once in time as the figure comes into view otherwise (scene.css). The
+// markup is the final frame. The row already says what the skill does, so assistive
+// technology skips the figure.
+import { FIGURE_VIEWBOX, skillFigures } from '../data/skill-figures.mjs';
+import '../styles/scene.css';
+
+interface Props {
+	name: string;
+}
+
+const parts = skillFigures[Astro.props.name];
+if (!parts) throw new Error(`src/data/skill-figures.mjs no tiene la figura de ${Astro.props.name}.`);
+// Drawn strokes measure 1, so scene.css draws any of them with the same dash. The class goes
+// apart from the spread, where Astro would replace it with its scope class.
+const attributes = (className: string, attrs: Record<string, string | number>) => ({
+	...attrs,
+	pathLength: className.split(' ').includes('draw') ? 1 : undefined,
+});
+---
+
+<svg class="scene-art skill-figure" viewBox={FIGURE_VIEWBOX} aria-hidden="true" focusable="false">
+	{
+		parts.map(([Tag, className, attrs, children]) => (
+			<Tag class={className} {...attributes(className, attrs)}>
+				{children?.map(([Child, childClass, childAttrs]) => <Child class={childClass} {...attributes(childClass, childAttrs)} />)}
+			</Tag>
+		))
+	}
+</svg>
+
+<script>
+	// Decides how the skill figures move (scene.css). data-motion records the mode: "scroll"
+	// where CSS has scroll timelines, "time" otherwise. Only a figure still below the screen
+	// moves, so one already visible keeps its final frame and never flickers. With the scroll
+	// (data-play="scroll") its story follows the scroll, forward and back. In time it waits on
+	// its first frame (data-play="waiting") until its top passes 80 % of the screen's height,
+	// then plays once ("run"). With reduced motion, or without IntersectionObserver in time
+	// mode, nothing moves.
+	const figures = [...document.querySelectorAll<SVGSVGElement>('svg.skill-figure')];
+	if (figures.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+		const scroll = CSS.supports('animation-timeline: view()');
+		const below = figures.filter((figure) => figure.getBoundingClientRect().top >= innerHeight);
+		for (const figure of figures) figure.dataset.motion = scroll ? 'scroll' : 'time';
+		if (scroll) {
+			for (const figure of below) figure.dataset.play = 'scroll';
+		} else if ('IntersectionObserver' in window) {
+			const observer = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (!entry.isIntersecting || !(entry.target instanceof SVGSVGElement)) continue;
+						entry.target.dataset.play = 'run';
+						observer.unobserve(entry.target);
+					}
+				},
+				{ rootMargin: '0% 0% -20% 0%' },
+			);
+			for (const figure of below) {
+				figure.dataset.play = 'waiting';
+				observer.observe(figure);
+			}
+		}
+	}
+</script>
+
+<style>
+	/* The ledger row sets the width (--figure-width); the height follows the drawing. */
+	svg {
+		width: var(--figure-width, var(--skill-figure-width));
+		max-width: 100%;
+		height: auto;
+	}
+</style>

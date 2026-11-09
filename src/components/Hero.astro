@@ -1,9 +1,11 @@
 ---
 // Replaces Starlight's Hero on the splash landings: the headline, one sentence and the actions
 // from the page's frontmatter and, on pages with `install: true`, the install commands of the
-// latest release beside them (tabs per client). Starlight's 404 page also uses this hero.
+// latest release below them (tabs per client) and the scene of the plugin at work beside them.
+// Starlight's 404 page also uses this hero, without commands or scene.
 import { LinkButton, TabItem, Tabs } from '@astrojs/starlight/components';
 import InstallCommand from './InstallCommand.astro';
+import Scene from './Scene.astro';
 import { release } from '../lib/release';
 
 const { data } = Astro.locals.starlightRoute.entry;
@@ -12,7 +14,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 ---
 
 <div class="hero-frame">
-<div class="hero">
+<div class:list={['hero', { 'with-scene': clients.length > 0 }]}>
 	<div class="lead">
 		<h1 id="_top" data-page-title set:html={title} />
 		{tagline && <p class="tagline" set:html={tagline} />}
@@ -27,6 +29,11 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 			</a>
 		</div>
 	</div>
+	{clients.length > 0 && (
+	<div class="scene">
+		<Scene />
+	</div>
+	)}
 	{clients.length > 0 && (
 	<section class="install" aria-labelledby="install">
 		<h2 id="install">{Astro.locals.t('peqa.install.title')}</h2>
@@ -148,13 +155,39 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 	.hero-frame {
 		container: hero / inline-size;
 	}
-	/* Token --breakpoint-hero: headline and install commands side by side. */
+	.scene {
+		min-width: 0;
+	}
+	/* Token --breakpoint-hero: two columns. */
 	@container hero (min-width: 60em) {
 		.hero {
 			grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
 			align-items: center;
 			gap: var(--space-8);
 			padding-block: var(--section-space);
+		}
+		/* On the landings the headline, its actions and the install commands share the left
+		   column and the scene takes the right one, at its larger unit. */
+		.with-scene {
+			grid-template-areas:
+				'lead scene'
+				'install scene';
+			align-items: start;
+			row-gap: var(--space-7);
+			padding-block: var(--space-7);
+		}
+		.with-scene .lead {
+			grid-area: lead;
+		}
+		.with-scene .install {
+			grid-area: install;
+		}
+		.with-scene .scene {
+			grid-area: scene;
+			align-self: center;
+			display: flex;
+			justify-content: flex-end;
+			--hero-scene-unit: var(--scene-unit-hero);
 		}
 	}
 </style>

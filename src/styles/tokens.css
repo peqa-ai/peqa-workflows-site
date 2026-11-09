@@ -18,6 +18,7 @@
 	--scene-panel: #171c21;
 	--scene-edge: #2b3238;
 	--scene-icon: #6b747d; /* 3:1 on screens and panels */
+	--scene-placeholder: #2b333a; /* peqa.ai: a line of text not yet written */
 
 	--font-brand: "Neue Machina", "Arial Narrow", system-ui, sans-serif;
 	--font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -91,6 +92,51 @@
 	--diagram-min-scale: 0.75;
 	/* Starlight's own breakpoint for the larger nav and headings (repeated in @media). */
 	--breakpoint-nav: 50em;
+
+	/* Scenes (scene.css): the landing's SVG drawings. Motion follows peqa.ai's Corporate
+	   archetype: one curve, a short duration palette, no overshoot beyond 3 %. Source of the
+	   next eleven values: peqa.ai, website src/styles/globals.css (project scenes) and
+	   src/styles/Scene.module.css (stroke widths), copied 2026-11-09. */
+	--scene-ease: cubic-bezier(0.2, 0, 0, 1);
+	--scene-standard: 300ms; /* an element entering */
+	--scene-beat: 500ms; /* one step of a story; the hero's stays under 5 s */
+	/* Entrance distance and scan travel, in scene units (lengths inside an SVG's viewBox). */
+	--scene-rise: 6px;
+	--scene-scan: 72px;
+	/* Scene type, in scene units, so it scales with the drawing. */
+	--scene-label: 11px;
+	--scene-text: 13px;
+	--scene-strong: 16px;
+	/* Strokes, in scene units: outlines, accent marks and placeholder text lines. */
+	--scene-stroke: 1.5px;
+	--scene-stroke-strong: 2px;
+	--scene-stroke-line: 5px;
+	/* One scene unit at the default 16 px text is 1.1 px, so labels of 11 units read at about
+	   12 px (peqa.ai src/components/Scene.js, EM_PER_UNIT = 1.1 / 16). */
+	--scene-unit: 0.06875em;
+	/* The hero scene beside the headline, at the plan's cap of 1.6 px per unit: at 1440 × 900
+	   the scene (416 × 656 px) fits the right column and stays shorter than the headline,
+	   actions and install commands beside it. Source: the plan. */
+	--scene-unit-hero: 0.1em;
+	/* How far a note travels in the memoria figures (into its tray, out of its stack), in
+	   scene units. Source: the figures' drawing. */
+	--scene-shift: 80px;
+	/* Skill figures: their width beside the text of a wide ledger, and beside the skill's name
+	   when the ledger stacks. Source: the 160 × 80 drawing at about 1 and 0.7 px per unit. */
+	--skill-figure-width: 10rem;
+	--skill-figure-width-compact: 7rem;
+	/* A figure tells its story while it scrolls from fully entered at the bottom of the screen
+	   (the start of its contain range, whose top is inset by Starlight's scroll-padding under
+	   the header) to this point of that range: at 1440 × 900 its top is then at about 59 % of
+	   the screen's height, a little below the middle of the area under the header. Source: the
+	   plan. */
+	--skill-figure-story: 40%;
+	/* From this ledger width a row with a figure puts it in a third column, beside the text
+	   (repeated in @container). Source: an 11rem key, about 25rem of text and the figure. */
+	--ledger-figure-width: 48rem;
+	/* Below this ledger width the figure no longer fits beside «memoria-guardar» (about 9rem of
+	   mono at 1rem) and goes under the name (repeated in @container). */
+	--ledger-figure-stack-width: 17rem;
 
 	/* Roles: what components and pages use. */
 	--color-surface: var(--background);

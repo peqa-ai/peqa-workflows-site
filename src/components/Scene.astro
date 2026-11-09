@@ -1,0 +1,92 @@
+---
+// The landing's hero scene, translated from peqa.ai's Scene.js (scene `peqa-workflows`) into
+// one vertical piece: the agent session above, the pull request below. It tells one story in
+// beats of --scene-beat (scene.css), once, on load: b1 plays at the second beat. The markup is
+// the final frame. Assistive technology reads the scene as one image described by its story.
+import { sceneCopy } from '../data/scene';
+import '../styles/scene.css';
+
+const t = sceneCopy[Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es'];
+// The three subagents start together; the first finishes a beat before the other two.
+const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, done: index > 0 ? 'b3' : 'b2' }));
+---
+
+<figure class="hero-scene" role="img" aria-label={t.label}>
+	<svg class="scene-art" viewBox="0 0 260 410" aria-hidden="true" focusable="false">
+		{/* The agent session: the request, then three subagents working in parallel. */}
+		<rect class="screen" x="2" y="2" width="256" height="184" />
+		<text class="label" x="14" y="22">{t.session}</text>
+		<line class="rule" x1="2" y1="32" x2="258" y2="32" />
+		<rect class="panel" x="14" y="42" width="232" height="42" />
+		<path class="icon" d="M21 49l4 4-4 4" />
+		<g class="enter">
+			<text class="small" x="32" y="57">{t.command}</text>
+			<text class="small" x="32" y="74" data-example>{t.request}</text>
+		</g>
+		<g class="enter b1">
+			<text class="label" x="14" y="106">{t.subagents}</text>
+			{
+				agents.map(({ name, file, y }) => (
+					<>
+						<text class="small" x="14" y={y}>{name}</text>
+						<text class="label" x="86" y={y}>{file}</text>
+					</>
+				))
+			}
+		</g>
+		{
+			agents.map(({ y, done }, index) => (
+				<>
+					<g class:list={['interim', 'b1', index > 0 && 'span2']}>
+						<rect class="accent breathe" x="231" y={y - 9} width="7" height="7" />
+					</g>
+					<path class:list={['accent-line', 'enter', done]} d={`M228 ${y - 4}l4 4 8-9`} />
+				</>
+			))
+		}
+
+		{/* The pull request: it opens, revisa reviews it and the person decides the merge, the
+		    scene's one lit step. */}
+		<rect class="screen" x="2" y="200" width="256" height="208" />
+		<line class="rule" x1="2" y1="220" x2="258" y2="220" />
+		<rect class="panel" x="10" y="207" width="6" height="6" />
+		<rect class="panel" x="20" y="207" width="6" height="6" />
+		<rect class="panel" x="30" y="207" width="6" height="6" />
+		<rect class="panel" x="90" y="206" width="80" height="8" />
+		<g class="slide b4">
+			<text class="strong" x="16" y="244" data-example>{t.pr}</text>
+			<text class="small" x="16" y="264">{t.prTitle}</text>
+			<rect class="ink" x="16" y="276" width="8" height="8" />
+			<text class="small" x="30" y="284">{t.open}</text>
+		</g>
+		<g class="enter b5">
+			<text class="small" x="16" y="312">{t.review}</text>
+			<rect class="tag" x="134" y="299" width="110" height="18" />
+			<text class="tag-text" x="189" y="312" text-anchor="middle">{t.noFindings}</text>
+		</g>
+		<g class="enter b6">
+			<line class="rule" x1="16" y1="328" x2="244" y2="328" />
+			<text x="16" y="352">{t.ask}</text>
+			<rect class="button lit b7" x="16" y="364" width="110" height="30" />
+			<text class="lit-text b7" x="71" y="384" text-anchor="middle">{t.merge}</text>
+			<circle class="tap b7" cx="71" cy="379" r="16" />
+			<text class="label" x="138" y="383">{t.later}</text>
+		</g>
+	</svg>
+</figure>
+
+<style>
+	.hero-scene {
+		margin: 0;
+		min-width: 0;
+		font-size: var(--text-sm);
+	}
+	/* In em, so the scene grows with the reader's text, and never wider than its column. The
+	   hero may pass a larger unit in --hero-scene-unit. 260 is the drawing's width in scene
+	   units (its viewBox). */
+	svg {
+		width: calc(260 * var(--hero-scene-unit, var(--scene-unit)));
+		max-width: 100%;
+		height: auto;
+	}
+</style>

@@ -1,0 +1,12 @@
+{
+	"peqa.install.title": "Instala el plugin",
+	"peqa.install.then": "Después, en una sesión nueva:",
+	"peqa.language.label": "English version",
+	"peqa.language.href": "/en/",
+	"peqa.language.lang": "en",
+	"peqa.install.command": "Comando",
+	"peqa.install.copy": "Copiar",
+	"peqa.install.copyCommand": "Copiar comando",
+	"peqa.install.copied": "Copiado",
+	"peqa.install.copyFailed": "No se pudo copiar. Selecciona el comando y cópialo manualmente."
+}

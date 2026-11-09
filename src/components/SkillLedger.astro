@@ -1,0 +1,48 @@
+---
+// The skills of the README table «Qué le puedes pedir», in its order, as a ledger: the skill's
+// name, one sentence (src/data/skills.ts) and the example request of the README.
+import { skillCopy } from '../data/skills';
+import { release } from '../lib/release';
+import Ledger from './Ledger.astro';
+import LedgerRow from './LedgerRow.astro';
+
+const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
+const copy = skillCopy[lang];
+const names = release.skills.map((skill) => skill.name);
+const missing = names.filter((name) => !copy[name]);
+const stale = Object.keys(copy).filter((name) => !names.includes(name));
+if (missing.length || stale.length) {
+	throw new Error(
+		`src/data/skills.ts (${lang}) no coincide con la tabla «Qué le puedes pedir» de ${release.release.tag}: ` +
+			[missing.length && `faltan ${missing.join(', ')}`, stale.length && `sobran ${stale.join(', ')}`].filter(Boolean).join('; ') +
+			'.',
+	);
+}
+const rows = release.skills.map((skill) => ({
+	name: skill.name,
+	summary: copy[skill.name].summary,
+	example: lang === 'es' ? skill.example : copy[skill.name].example,
+}));
+---
+
+<Ledger>
+	{
+		rows.map((row) => (
+			<LedgerRow term={row.name}>
+				<p>{row.summary}</p>
+				<p>
+					<q>{row.example}</q>
+				</p>
+			</LedgerRow>
+		))
+	}
+</Ledger>
+
+<style>
+	q:lang(es) {
+		quotes: '«' '»';
+	}
+	q:lang(en) {
+		quotes: '“' '”';
+	}
+</style>

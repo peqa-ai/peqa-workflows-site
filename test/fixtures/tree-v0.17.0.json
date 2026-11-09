@@ -1,0 +1,394 @@
+[
+{
+"path": ".agents",
+"type": "tree"
+},
+{
+"path": ".agents/plugins",
+"type": "tree"
+},
+{
+"path": ".agents/plugins/marketplace.json",
+"type": "blob"
+},
+{
+"path": ".claude-plugin",
+"type": "tree"
+},
+{
+"path": ".claude-plugin/marketplace.json",
+"type": "blob"
+},
+{
+"path": ".claude-plugin/plugin.json",
+"type": "blob"
+},
+{
+"path": ".codex-plugin",
+"type": "tree"
+},
+{
+"path": ".codex-plugin/plugin.json",
+"type": "blob"
+},
+{
+"path": ".gitignore",
+"type": "blob"
+},
+{
+"path": ".peqa",
+"type": "tree"
+},
+{
+"path": ".peqa/memoria",
+"type": "tree"
+},
+{
+"path": ".peqa/memoria/.gitignore",
+"type": "blob"
+},
+{
+"path": ".peqa/memoria/project",
+"type": "tree"
+},
+{
+"path": ".peqa/memoria/project/distribucion",
+"type": "tree"
+},
+{
+"path": ".peqa/memoria/project/distribucion/actualizar-plugin-instalado.md",
+"type": "blob"
+},
+{
+"path": ".peqa/memoria/project/skills",
+"type": "tree"
+},
+{
+"path": ".peqa/memoria/project/skills/validar-instrucciones-con-simulaciones.md",
+"type": "blob"
+},
+{
+"path": "AGENTS.md",
+"type": "blob"
+},
+{
+"path": "CLAUDE.md",
+"type": "blob"
+},
+{
+"path": "LICENSE",
+"type": "blob"
+},
+{
+"path": "README.md",
+"type": "blob"
+},
+{
+"path": "plugin.json",
+"type": "blob"
+},
+{
+"path": "references",
+"type": "tree"
+},
+{
+"path": "references/checks-and-hooks.md",
+"type": "blob"
+},
+{
+"path": "references/project-memory.md",
+"type": "blob"
+},
+{
+"path": "references/runtime-tools.md",
+"type": "blob"
+},
+{
+"path": "references/submodules.md",
+"type": "blob"
+},
+{
+"path": "references/usage.md",
+"type": "blob"
+},
+{
+"path": "references/visual-evidence.md",
+"type": "blob"
+},
+{
+"path": "scripts",
+"type": "tree"
+},
+{
+"path": "scripts/git_paths.py",
+"type": "blob"
+},
+{
+"path": "scripts/peqa_hooks.py",
+"type": "blob"
+},
+{
+"path": "scripts/peqa_usage.py",
+"type": "blob"
+},
+{
+"path": "scripts/project_memory.py",
+"type": "blob"
+},
+{
+"path": "scripts/review_checks.py",
+"type": "blob"
+},
+{
+"path": "skills",
+"type": "tree"
+},
+{
+"path": "skills/dirige",
+"type": "tree"
+},
+{
+"path": "skills/dirige/SKILL.md",
+"type": "blob"
+},
+{
+"path": "skills/dirige/agents",
+"type": "tree"
+},
+{
+"path": "skills/dirige/agents/openai.yaml",
+"type": "blob"
+},
+{
+"path": "skills/dirige/references",
+"type": "tree"
+},
+{
+"path": "skills/dirige/references/cleanup.md",
+"type": "blob"
+},
+{
+"path": "skills/dirige/references/coordination.md",
+"type": "blob"
+},
+{
+"path": "skills/dirige/references/runtimes.md",
+"type": "blob"
+},
+{
+"path": "skills/idea",
+"type": "tree"
+},
+{
+"path": "skills/idea/SKILL.md",
+"type": "blob"
+},
+{
+"path": "skills/idea/agents",
+"type": "tree"
+},
+{
+"path": "skills/idea/agents/openai.yaml",
+"type": "blob"
+},
+{
+"path": "skills/memoria-extraer",
+"type": "tree"
+},
+{
+"path": "skills/memoria-extraer/SKILL.md",
+"type": "blob"
+},
+{
+"path": "skills/memoria-extraer/agents",
+"type": "tree"
+},
+{
+"path": "skills/memoria-extraer/agents/openai.yaml",
+"type": "blob"
+},
+{
+"path": "skills/memoria-guardar",
+"type": "tree"
+},
+{
+"path": "skills/memoria-guardar/SKILL.md",
+"type": "blob"
+},
+{
+"path": "skills/memoria-guardar/agents",
+"type": "tree"
+},
+{
+"path": "skills/memoria-guardar/agents/openai.yaml",
+"type": "blob"
+},
+{
+"path": "skills/revisa",
+"type": "tree"
+},
+{
+"path": "skills/revisa/SKILL.md",
+"type": "blob"
+},
+{
+"path": "skills/revisa/agents",
+"type": "tree"
+},
+{
+"path": "skills/revisa/agents/openai.yaml",
+"type": "blob"
+},
+{
+"path": "skills/revisa/references",
+"type": "tree"
+},
+{
+"path": "skills/revisa/references/budget.md",
+"type": "blob"
+},
+{
+"path": "skills/revisa/references/report.md",
+"type": "blob"
+},
+{
+"path": "skills/revisa/references/reviewers.md",
+"type": "blob"
+},
+{
+"path": "skills/revisa/references/security.md",
+"type": "blob"
+},
+{
+"path": "skills/revisa/references/validation.md",
+"type": "blob"
+},
+{
+"path": "skills/revisa/scripts",
+"type": "tree"
+},
+{
+"path": "skills/revisa/scripts/review_budget.py",
+"type": "blob"
+},
+{
+"path": "skills/ui-design",
+"type": "tree"
+},
+{
+"path": "skills/ui-design/SKILL.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/agents",
+"type": "tree"
+},
+{
+"path": "skills/ui-design/agents/openai.yaml",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references",
+"type": "tree"
+},
+{
+"path": "skills/ui-design/references/copy.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/critique.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/design-system.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/marketing-page.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/native.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/product-ui.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/scoring.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/tells.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/references/typography.md",
+"type": "blob"
+},
+{
+"path": "skills/ui-design/scripts",
+"type": "tree"
+},
+{
+"path": "skills/ui-design/scripts/ui_checks.py",
+"type": "blob"
+},
+{
+"path": "tests",
+"type": "tree"
+},
+{
+"path": "tests/dirige-cleanup-scenarios.md",
+"type": "blob"
+},
+{
+"path": "tests/dirige-commit-scenarios.md",
+"type": "blob"
+},
+{
+"path": "tests/dirige-memoria-scenarios.md",
+"type": "blob"
+},
+{
+"path": "tests/memoria-aprobacion-scenarios.md",
+"type": "blob"
+},
+{
+"path": "tests/memoria-pr-scenarios.md",
+"type": "blob"
+},
+{
+"path": "tests/test_peqa_hooks.py",
+"type": "blob"
+},
+{
+"path": "tests/test_peqa_usage.py",
+"type": "blob"
+},
+{
+"path": "tests/test_project_memory.py",
+"type": "blob"
+},
+{
+"path": "tests/test_review_budget.py",
+"type": "blob"
+},
+{
+"path": "tests/test_review_checks.py",
+"type": "blob"
+},
+{
+"path": "tests/test_ui_checks.py",
+"type": "blob"
+},
+{
+"path": "tests/ui-design-scenarios.md",
+"type": "blob"
+},
+{
+"path": "tests/visual-evidence-scenarios.md",
+"type": "blob"
+}
+]

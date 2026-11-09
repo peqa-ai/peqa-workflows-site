@@ -1,0 +1,31 @@
+---
+// A landing section: a rule and a title open it, its content follows (peqa.ai's .section).
+interface Props {
+	id: string;
+	title: string;
+}
+const { id, title } = Astro.props;
+---
+
+<section class="landing-section not-content" aria-labelledby={id}>
+	<h2 {id}>{title}</h2>
+	<slot />
+</section>
+
+<style>
+	.landing-section {
+		display: grid;
+		gap: var(--space-5);
+		padding-block: var(--space-6);
+		border-top: var(--border-width) solid var(--color-border);
+	}
+	h2 {
+		max-width: var(--heading-measure);
+		font-family: var(--font-brand);
+		font-weight: var(--weight-title);
+		font-size: var(--text-section);
+		line-height: var(--leading-tight);
+		letter-spacing: var(--tracking-tight);
+		color: var(--color-text);
+	}
+</style>

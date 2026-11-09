@@ -1,0 +1,15 @@
+---
+// peqa.ai's ledger: rows of a mono key beside its value, each opened by a rule. Rows are
+// LedgerRow. No closing rule: the next section's rule closes the list.
+---
+
+<dl class="ledger"><slot /></dl>
+
+<style>
+	.ledger {
+		display: grid;
+		margin: 0;
+		min-width: 0;
+		container-type: inline-size;
+	}
+</style>

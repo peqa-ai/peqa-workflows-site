@@ -1,0 +1,61 @@
+---
+title: Skills para programar con agentes
+description: Plugin abierto de seis skills para Codex y Claude Code que coordina subagentes, diseña interfaces, revisa PRs y guarda la memoria del proyecto entre sesiones.
+template: splash
+install: true
+editUrl: false
+pagefind: false
+hero:
+  tagline: Un plugin abierto para Codex y Claude Code que coordina subagentes, diseña interfaces, revisa PRs y guarda la memoria del proyecto entre sesiones.
+  actions:
+    - text: Leer la documentación
+      link: /docs/
+      variant: primary
+    - text: Ver en GitHub
+      link: https://github.com/peqa-ai/peqa-workflows
+      variant: secondary
+---
+
+import LandingSection from '../../components/LandingSection.astro';
+import Ledger from '../../components/Ledger.astro';
+import LedgerRow from '../../components/LedgerRow.astro';
+import SkillLedger from '../../components/SkillLedger.astro';
+import { formatDate, release } from '../../lib/release';
+
+<LandingSection id="que-pedir" title="Qué le puedes pedir">
+	<SkillLedger />
+</LandingSection>
+
+<LandingSection id="donde-funciona" title="Dónde funciona">
+	<Ledger>
+		<LedgerRow term="Claude Code">
+			<p>Se instala como plugin. Invoca los skills con <code>{release.install.claudeCode.invoke}</code>.</p>
+		</LedgerRow>
+		<LedgerRow term="Codex">
+			<p>En la CLI con soporte para plugins. Invoca los skills con <code>{release.install.codex.invoke}</code>.</p>
+		</LedgerRow>
+		<LedgerRow term="T3 Code">
+			<p>Integración preferente: coordina los subagentes con Orchestrator V2.</p>
+		</LedgerRow>
+		<LedgerRow term="Orca">
+			<p>Los skills funcionan en las sesiones de Codex o Claude Code que abras en Orca.</p>
+		</LedgerRow>
+	</Ledger>
+</LandingSection>
+
+<LandingSection id="version" title="Versión publicada">
+	<Ledger>
+		<LedgerRow term="Versión">
+			<p><a href={release.release.url}>{release.release.version}</a></p>
+		</LedgerRow>
+		<LedgerRow term="Publicada">
+			<p><time datetime={release.release.publishedAt}>{formatDate(release.release.publishedAt, 'es')}</time></p>
+		</LedgerRow>
+		<LedgerRow term="Licencia">
+			<p><a href={`https://github.com/${release.repo}/blob/${release.release.tag}/LICENSE`}>MIT</a></p>
+		</LedgerRow>
+		<LedgerRow term="Hecho por">
+			<p>PEQA, <a href="https://peqa.ai">peqa.ai</a></p>
+		</LedgerRow>
+	</Ledger>
+</LandingSection>

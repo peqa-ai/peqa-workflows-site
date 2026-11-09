@@ -85,14 +85,16 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 </figure>
 
 <script>
-	import { belowScreen, playOnView, reducedMotion } from '../lib/play-on-view';
+	import { belowScreen, playOnView, reducedMotion, withoutBox } from '../lib/play-on-view';
 
 	// On a phone the scene follows the install commands, below the screen at load: it waits on
 	// its first frame there and plays once its last piece, the pull request where the story
-	// ends, is all in view. A hidden scene has no box, so it is never below the screen and stays
-	// as it is.
+	// ends, is all in view. A scene hidden at load (large text in a narrow column) waits too: a
+	// rotation or a smaller text size can show it later, and it must not play out of view.
 	const scene = document.querySelector<HTMLElement>('.hero-scene');
-	if (scene && !reducedMotion() && belowScreen(scene)) playOnView([scene], { endsIn: (element) => element.lastElementChild });
+	if (scene && !reducedMotion() && (belowScreen(scene) || withoutBox(scene))) {
+		playOnView([scene], { endsIn: (element) => element.lastElementChild });
+	}
 </script>
 
 <style>

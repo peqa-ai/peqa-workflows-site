@@ -2,6 +2,7 @@
 // Every function here is pure: the network lives in github.mjs and the files in sync-release.mjs.
 import { posix } from 'node:path';
 import GithubSlugger from 'github-slugger';
+import { fromHtml } from 'hast-util-from-html';
 import { fromMarkdown } from 'mdast-util-from-markdown';
 import { gfmFromMarkdown } from 'mdast-util-gfm';
 import { toString } from 'mdast-util-to-string';
@@ -300,6 +301,9 @@ export function extractInstall(markdown) {
 		const entry = install[client.key];
 		if (!entry) throw new SyncError(`«## ${INSTALL_SECTION}» no tiene la etiqueta **${client.name}**.`);
 		if (entry.command === null) throw new SyncError(`Falta el bloque \`\`\`sh bajo **${entry.label}** en «## ${INSTALL_SECTION}».`);
+		if (entry.command.trim() === '' || entry.command.split('\n').some((line) => line.trim() === '')) {
+			throw new SyncError(`El bloque \`\`\`sh bajo **${entry.label}** en «## ${INSTALL_SECTION}» está vacío o tiene líneas vacías.`);
+		}
 		if (entry.invoke === null) throw new SyncError(`«## ${INSTALL_SECTION}» no dice cómo invocar los skills en ${client.name} («- ${client.name}: \`…\`»).`);
 	}
 	return install;
@@ -375,8 +379,58 @@ export function renderPage({ title, body, order, editUrl, sidebarLabel, source }
  * Builds every generated file from one release: the docs pages (index first) and the data
  * the landing reads. Throws a SyncError when the README lacks something the site needs.
  */
+/**
+ * HTML the README may carry into the site: documentation markup only. Astro inserts a page's
+ * raw HTML unescaped and the schedule publishes new releases without a commit here, so any
+ * other element, an event handler or a script URL fails the sync instead of reaching
+ * workflows.peqa.ai. Mermaid diagrams are code blocks, not HTML, and Mermaid sanitises them.
+ */
+const SAFE_ELEMENTS = new Set([
+	'a', 'abbr', 'b', 'blockquote', 'br', 'code', 'dd', 'del', 'details', 'div', 'dl', 'dt', 'em', 'h1',
+	'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'i', 'img', 'ins', 'kbd', 'li', 'mark', 'ol', 'p', 'picture', 'pre',
+	'q', 's', 'samp', 'source', 'span', 'strong', 'sub', 'summary', 'sup', 'table', 'tbody', 'td', 'tfoot',
+	'th', 'thead', 'tr', 'u', 'ul', 'var',
+]);
+const SAFE_ATTRIBUTES = new Set([
+	'align', 'alt', 'className', 'colSpan', 'dir', 'height', 'href', 'id', 'lang', 'media', 'name', 'open',
+	'rowSpan', 'src', 'srcSet', 'start', 'title', 'type', 'width',
+]);
+const URL_ATTRIBUTES = new Set(['href', 'src', 'srcSet']);
+
+/** True for relative URLs and for http(s) and mailto; false for javascript:, data: and the rest. */
+export function isSafeUrl(value) {
+	const url = String(value).trim();
+	const scheme = url.match(/^([a-z][a-z0-9+.-]*):/i);
+	return !scheme || ['http', 'https', 'mailto'].includes(scheme[1].toLowerCase());
+}
+
+/** Throws a SyncError naming the first unsafe HTML or link destination of the README. */
+export function assertSafeMarkdown(markdown) {
+	const fail = (node, what) => {
+		const line = node.position?.start.line;
+		throw new SyncError(`El README tiene ${what}${line ? ` en la línea ${line}` : ''}; el sitio no lo publica.`);
+	};
+	walk(parseMarkdown(markdown), (node) => {
+		if ((node.type === 'link' || node.type === 'image' || node.type === 'definition') && !isSafeUrl(node.url)) {
+			fail(node, `un enlace con un protocolo no permitido («${node.url}»)`);
+		}
+		if (node.type !== 'html') return;
+		walk(fromHtml(node.value, { fragment: true }), (element) => {
+			if (element.type !== 'element') return;
+			if (!SAFE_ELEMENTS.has(element.tagName)) fail(node, `HTML no permitido (<${element.tagName}>)`);
+			for (const [name, value] of Object.entries(element.properties ?? {})) {
+				if (!SAFE_ATTRIBUTES.has(name)) fail(node, `un atributo HTML no permitido («${name}» en <${element.tagName}>)`);
+				if (!URL_ATTRIBUTES.has(name)) continue;
+				const urls = name === 'srcSet' ? String(value).split(',').map((entry) => entry.trim().split(/\s+/)[0]) : [value];
+				for (const url of urls) if (!isSafeUrl(url)) fail(node, `un enlace con un protocolo no permitido («${url}»)`);
+			}
+		});
+	});
+}
+
 export function buildSite({ readme, release, repo, paths, editUrl, introLabel }) {
 	const tag = release.tag;
+	assertSafeMarkdown(readme);
 	const original = splitReadme(readme);
 	const anchors = buildAnchorMap(readme, original.sections);
 	const context = { repo, tag, anchors, paths };

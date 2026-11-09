@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
 import {
+	assertSafeMarkdown,
 	buildAnchorMap,
 	buildSite,
 	extractInstall,
@@ -210,6 +211,47 @@ describe('extractInstall', () => {
 		assert.throws(() => extractInstall(README.replace('**Codex CLI con soporte para plugins**', 'Codex')), /\*\*Codex\*\*/);
 		assert.throws(() => extractInstall(README.replace('```sh\ncodex plugin', '```bash\ncodex plugin')), /```sh/);
 		assert.throws(() => extractInstall(README.replace('- Codex: `$peqa-workflows:dirige`.', '- Codex.')), /invocar/);
+	});
+
+	test('fails on an empty install block or an empty line inside it', () => {
+		const claude = 'claude plugin marketplace add peqa-ai/peqa-workflows\nclaude plugin install peqa-workflows@peqa --scope user';
+		assert.throws(() => extractInstall(README.replace(claude, '')), /vacío/);
+		assert.throws(() => extractInstall(README.replace(claude, '   ')), /vacío/);
+		assert.throws(() => extractInstall(README.replace(claude, claude.replace('\n', '\n\n'))), /vacío/);
+	});
+});
+
+describe('assertSafeMarkdown', () => {
+	const page = (body) => `# T\n\n${body}\n`;
+
+	test('accepts the release README and documentation HTML', () => {
+		assert.doesNotThrow(() => assertSafeMarkdown(README));
+		assert.doesNotThrow(() => assertSafeMarkdown(page('<details open><summary>Más</summary>\n\nTexto [enlace](https://x.dev) y <a href="#ancla">ancla</a>.\n\n</details>')));
+	});
+
+	test('rejects scripts, event handlers, unknown elements and script URLs, however written', () => {
+		for (const bad of [
+			'<script>globalThis.__readmeProbe = 1</script>',
+			'<img src="x.png" onerror="alert(1)">',
+			'<a href="#" onclick="alert(1)">x</a>',
+			'<svg onload="alert(1)"></svg>',
+			'<iframe src="https://example.com"></iframe>',
+			'<style>body { display: none }</style>',
+			'<a href="javascript:alert(1)">x</a>',
+			'<a href="&#106;avascript:alert(1)">x</a>',
+			'<img src="data:image/svg+xml,<svg onload=alert(1)>">',
+			'[x](javascript:alert(1))',
+			'[x][ref]\n\n[ref]: vbscript:msgbox(1)',
+		]) {
+			assert.throws(() => assertSafeMarkdown(page(bad)), SyncError, bad);
+		}
+	});
+
+	test('stops buildSite before any page is generated', () => {
+		assert.throws(
+			() => buildSite({ readme: `${README}\n<script>x()</script>\n`, release: RELEASE, repo: REPO, paths: PATHS, editUrl: '', introLabel: 'Introducción' }),
+			/<script>/,
+		);
 	});
 });
 

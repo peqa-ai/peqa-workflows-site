@@ -1,0 +1,157 @@
+/*
+ * PEQA workflows design tokens: the only file with color, type, space and radius literals.
+ * Source of every value: peqa.ai, website src/styles/globals.css (copied 2026-11-09), unless the
+ * comment beside it names another source. config/tokens.mjs reads this file for the build-time
+ * renderers (Mermaid diagrams, code blocks), so they share these values.
+ *
+ * Layers: base values (peqa.ai names) → roles (--color-*) → Starlight's --sl-* variables.
+ */
+:root {
+	/* Base values: the approved peqa.ai identity. */
+	--background: #050607;
+	--foreground: #f4f2ea;
+	--muted: #a7a49a; /* 7.9:1 on --background */
+	--line: rgba(244, 242, 234, 0.22);
+	--accent: #efff00;
+	/* peqa.ai scene surfaces: the page background lifted in steps, without a second accent. */
+	--scene-screen: #0e1114;
+	--scene-panel: #171c21;
+	--scene-edge: #2b3238;
+	--scene-icon: #6b747d; /* 3:1 on screens and panels */
+
+	--font-brand: "Neue Machina", "Arial Narrow", system-ui, sans-serif;
+	--font-body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+	--font-mono: ui-monospace, "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+
+	/* Editorial scale 1.25. */
+	--text-xs: 0.8rem;
+	--text-sm: 1rem;
+	--text-md: 1.25rem;
+	--text-lg: 1.563rem;
+	--text-xl: 1.953rem;
+	--text-2xl: 2.441rem;
+	--text-display: clamp(1.25rem, 1.25rem + 2.8vw, 3.815rem);
+	--text-section: clamp(1.563rem, 2.4vw, 2.441rem);
+	--weight-normal: 400;
+	--weight-title: 800;
+	--leading-tight: 1.08;
+	--leading-body: 1.6;
+	--tracking-tight: -0.045em;
+
+	/* Shared 4px spacing scale. */
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-5: 1.5rem;
+	--space-6: 2rem;
+	--space-7: 3rem;
+	--space-8: 4rem;
+	--space-9: 6rem;
+	--section-space: clamp(3rem, 6vw, 6rem);
+	--layout-max: 82rem;
+	--measure: 60ch;
+	--heading-measure: 18ch;
+
+	--border-width: 1px;
+	--focus-width: 2px;
+	--focus-offset: 4px;
+	--touch-target: 44px;
+	--radius: 0;
+	--motion-duration: 140ms;
+	--motion-ease: ease-out;
+	--press-opacity: 0.8; /* peqa.ai .primaryLink:active */
+
+	/* Static brand signature (peqa_brand.js): lowercase glyphs, accent suffix, caret. */
+	--brand-leading: 0.86;
+	--brand-tracking: -0.07em;
+	--brand-mask-top: 0.16em;
+	--brand-mask-bottom: 0.24em;
+	--brand-caret-width: 0.0923em;
+	--brand-caret-height: 0.4em;
+	--brand-caret-gap: 0.0615em;
+	--brand-caret-bottom: 0.17em;
+
+	/* Ledger: mono key column beside its value. peqa.ai uses 9rem for 0.8rem keys; here the key
+	   is the skill's name at 1rem, so the column fits «memoria-guardar» (15 characters). */
+	--ledger-key-width: 11rem;
+	/* Below this ledger width the key goes above its value (repeated in @container). */
+	--ledger-stack-width: 24rem;
+	/* From this width the landing puts the install commands beside the headline (repeated in
+	   @media): the 51-character install line needs about half of it. Source: the commands. */
+	--breakpoint-hero: 64rem;
+	/* Starlight's own breakpoint for the larger nav and headings (repeated in @media). */
+	--breakpoint-nav: 50em;
+
+	/* Roles: what components and pages use. */
+	--color-surface: var(--background);
+	--color-surface-raised: var(--scene-screen); /* search dialog, raised panels */
+	--color-text: var(--foreground);
+	--color-text-muted: var(--muted);
+	--color-accent: var(--accent);
+	--color-on-accent: var(--background); /* 18:1 on --accent */
+	--color-border: var(--line);
+	--color-border-strong: var(--scene-icon); /* boundaries that must reach 3:1 */
+	--color-code-bg: var(--scene-panel);
+	--color-code-border: var(--scene-edge);
+	--color-focus: var(--accent);
+}
+
+/*
+ * Starlight's variables, mapped to the roles. Screen only: when printing, Starlight's own
+ * print stylesheet switches to dark text on white paper.
+ */
+@media screen {
+	:root,
+	::backdrop {
+		color-scheme: dark;
+		--sl-color-white: var(--color-text);
+		--sl-color-gray-1: var(--color-text);
+		--sl-color-gray-2: var(--color-text);
+		--sl-color-gray-3: var(--color-text-muted);
+		--sl-color-gray-4: var(--color-border-strong);
+		--sl-color-gray-5: var(--color-border);
+		--sl-color-gray-6: var(--color-surface-raised);
+		--sl-color-gray-7: var(--color-surface-raised);
+		--sl-color-black: var(--color-surface);
+		--sl-color-accent-low: var(--color-code-bg);
+		--sl-color-accent: var(--color-accent);
+		--sl-color-accent-high: var(--color-accent);
+		--sl-color-text: var(--color-text);
+		--sl-color-text-accent: var(--color-accent);
+		--sl-color-text-invert: var(--color-on-accent);
+		--sl-color-bg: var(--color-surface);
+		--sl-color-bg-nav: var(--color-surface);
+		--sl-color-bg-sidebar: var(--color-surface);
+		--sl-color-bg-inline-code: var(--color-code-bg);
+		--sl-color-bg-accent: var(--color-accent);
+		--sl-color-hairline-light: var(--color-border);
+		--sl-color-hairline: var(--color-border);
+		--sl-color-hairline-shade: var(--color-border);
+
+		--sl-font: var(--font-body);
+		--sl-font-mono: var(--font-mono);
+		--sl-text-body: var(--text-sm);
+		--sl-line-height: var(--leading-body);
+		--sl-line-height-headings: var(--leading-tight);
+		--sl-text-h1: var(--text-xl);
+		--sl-text-h2: var(--text-lg);
+		--sl-text-h3: var(--text-md);
+		--sl-text-h4: var(--text-sm);
+		--sl-text-h5: var(--text-sm);
+	}
+	/* Pages without sidebar (the landings) use peqa.ai's page width. */
+	:root:not([data-has-sidebar]) {
+		--sl-content-width: var(--layout-max);
+	}
+}
+
+/* Token --breakpoint-nav. */
+@media screen and (min-width: 50em) {
+	:root {
+		--sl-text-h1: var(--text-2xl);
+		--sl-text-h2: var(--text-xl);
+		--sl-text-h3: var(--text-lg);
+		--sl-text-h4: var(--text-md);
+	}
+}

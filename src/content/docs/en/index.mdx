@@ -1,0 +1,61 @@
+---
+title: Skills for coding with agents
+description: An open plugin of six skills for Codex and Claude Code that coordinates subagents, designs interfaces, reviews PRs and keeps project memory between sessions.
+template: splash
+install: true
+editUrl: false
+pagefind: false
+hero:
+  tagline: An open plugin for Codex and Claude Code that coordinates subagents, designs interfaces, reviews PRs and keeps project memory between sessions. The documentation is in Spanish. The skills answer in your language.
+  actions:
+    - text: Read the documentation
+      link: /en/docs/
+      variant: primary
+    - text: View on GitHub
+      link: https://github.com/peqa-ai/peqa-workflows
+      variant: secondary
+---
+
+import LandingSection from '../../../components/LandingSection.astro';
+import Ledger from '../../../components/Ledger.astro';
+import LedgerRow from '../../../components/LedgerRow.astro';
+import SkillLedger from '../../../components/SkillLedger.astro';
+import { formatDate, release } from '../../../lib/release';
+
+<LandingSection id="what-to-ask" title="What you can ask">
+	<SkillLedger />
+</LandingSection>
+
+<LandingSection id="where-it-runs" title="Where it runs">
+	<Ledger>
+		<LedgerRow term="Claude Code">
+			<p>Installs as a plugin. Invoke the skills with <code>{release.install.claudeCode.invoke}</code>.</p>
+		</LedgerRow>
+		<LedgerRow term="Codex">
+			<p>In the CLI with plugin support. Invoke the skills with <code>{release.install.codex.invoke}</code>.</p>
+		</LedgerRow>
+		<LedgerRow term="T3 Code">
+			<p>Preferred integration: it coordinates the subagents with Orchestrator V2.</p>
+		</LedgerRow>
+		<LedgerRow term="Orca">
+			<p>The skills work in the Codex or Claude Code sessions you open in Orca.</p>
+		</LedgerRow>
+	</Ledger>
+</LandingSection>
+
+<LandingSection id="release" title="Published version">
+	<Ledger>
+		<LedgerRow term="Version">
+			<p><a href={release.release.url}>{release.release.version}</a></p>
+		</LedgerRow>
+		<LedgerRow term="Published">
+			<p><time datetime={release.release.publishedAt}>{formatDate(release.release.publishedAt, 'en')}</time></p>
+		</LedgerRow>
+		<LedgerRow term="License">
+			<p><a href={`https://github.com/${release.repo}/blob/${release.release.tag}/LICENSE`}>MIT</a></p>
+		</LedgerRow>
+		<LedgerRow term="Made by">
+			<p>PEQA, <a href="https://peqa.ai">peqa.ai</a></p>
+		</LedgerRow>
+	</Ledger>
+</LandingSection>

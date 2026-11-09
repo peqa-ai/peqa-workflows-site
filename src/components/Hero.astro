@@ -1,0 +1,145 @@
+---
+// Replaces Starlight's Hero on the splash landings: the headline, one sentence and the actions
+// from the page's frontmatter and, on pages with `install: true`, the install commands of the
+// latest release beside them (tabs per client). Starlight's 404 page also uses this hero.
+import { Code, LinkButton, TabItem, Tabs } from '@astrojs/starlight/components';
+import { release } from '../lib/release';
+
+const { data } = Astro.locals.starlightRoute.entry;
+const { title = data.title, tagline, actions = [] } = data.hero ?? {};
+const clients = data.install ? [release.install.claudeCode, release.install.codex] : [];
+---
+
+<div class="hero">
+	<div class="lead">
+		<h1 id="_top" data-page-title set:html={title} />
+		{tagline && <p class="tagline" set:html={tagline} />}
+		<div class="actions">
+			{actions.map(({ attrs: { class: className, ...attrs } = {}, link: href, text, variant }) => (
+				<LinkButton {href} {variant} class:list={[className]} {...attrs}>
+					{text}
+				</LinkButton>
+			))}
+			<a class="language" href={Astro.locals.t('peqa.language.href')} hreflang={Astro.locals.t('peqa.language.lang')} lang={Astro.locals.t('peqa.language.lang')}>
+				{Astro.locals.t('peqa.language.label')}
+			</a>
+		</div>
+	</div>
+	{clients.length > 0 && (
+	<section class="install" aria-labelledby="install">
+		<h2 id="install">{Astro.locals.t('peqa.install.title')}</h2>
+		<Tabs syncKey="peqa-client">
+			{
+				clients.map((client) => (
+					<TabItem label={client.name}>
+						<Code code={client.command} lang="sh" frame="code" locale={Astro.locals.starlightRoute.lang} />
+						<p class="then">
+							{Astro.locals.t('peqa.install.then')} <code>{client.invoke}</code>
+						</p>
+					</TabItem>
+				))
+			}
+		</Tabs>
+	</section>
+	)}
+</div>
+
+<style>
+	.hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--space-6);
+		padding-block: var(--space-4) var(--space-6);
+	}
+	.lead {
+		display: grid;
+		justify-items: start;
+		gap: var(--space-5);
+		min-width: 0;
+	}
+	h1 {
+		font-family: var(--font-brand);
+		font-weight: var(--weight-title);
+		font-size: var(--text-display);
+		line-height: var(--leading-tight);
+		letter-spacing: var(--tracking-tight);
+		color: var(--color-text);
+		text-wrap: balance;
+	}
+	.tagline {
+		max-width: var(--measure);
+		font-size: var(--text-md);
+		line-height: var(--leading-body);
+		color: var(--color-text);
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--space-3) var(--space-5);
+	}
+	/* Below Starlight's nav breakpoint, pages without sidebar have no language picker. */
+	.language {
+		display: inline-flex;
+		align-items: center;
+		min-height: var(--touch-target);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		color: var(--color-text);
+		text-decoration: underline;
+		text-decoration-color: var(--color-accent);
+		text-underline-offset: var(--space-2);
+	}
+	.language:hover {
+		color: var(--color-accent);
+	}
+	.language:active {
+		opacity: var(--press-opacity);
+	}
+	@media (min-width: 50em) {
+		.language {
+			display: none;
+		}
+	}
+	.install {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--space-3);
+		min-width: 0;
+	}
+	.install h2 {
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		font-weight: var(--weight-normal);
+		letter-spacing: normal;
+		line-height: var(--leading-body);
+		color: var(--color-text);
+	}
+	.then {
+		margin-top: var(--space-3);
+		font-size: var(--text-sm);
+		color: var(--color-text);
+	}
+	/* As peqa.ai's command arguments: the invocation moves to the next line whole and only
+	   breaks when it is wider than the line. */
+	.then code {
+		display: inline-block;
+		max-width: 100%;
+		vertical-align: bottom;
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		padding: var(--space-1) var(--space-2);
+		background: var(--color-code-bg);
+		border: var(--border-width) solid var(--color-code-border);
+		overflow-wrap: anywhere;
+	}
+	/* Token --breakpoint-hero: headline and install commands side by side. */
+	@media (min-width: 64rem) {
+		.hero {
+			grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+			align-items: center;
+			gap: var(--space-8);
+			padding-block: var(--section-space);
+		}
+	}
+</style>

@@ -1,0 +1,21 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# generated from the latest peqa-workflows release by scripts/sync-release.mjs
+src/content/docs/docs/
+src/generated/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store

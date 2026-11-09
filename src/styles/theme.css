@@ -1,0 +1,102 @@
+/*
+ * Applies the tokens (tokens.css) to Starlight's own elements, the way peqa.ai styles its own.
+ * No literal values here. Unlayered, so these rules win over Starlight's cascade layers.
+ */
+
+::selection {
+	color: var(--color-on-accent);
+	background: var(--color-accent);
+}
+
+/* Visible keyboard focus everywhere; Starlight keeps its own offsets inside tabs and lists. */
+:focus-visible {
+	outline: var(--focus-width) solid var(--color-focus);
+}
+/* The current page's link is filled with the accent: a gap keeps the ring apart from it. */
+.sidebar-content a[aria-current="page"]:focus-visible {
+	outline-offset: var(--focus-width);
+}
+
+/* Page titles and content headings: Neue Machina 800, as on peqa.ai. */
+h1#_top,
+.sl-markdown-content :is(h2, h3, h4, h5):not(:where(.not-content *)) {
+	font-family: var(--font-brand);
+	font-weight: var(--weight-title);
+	line-height: var(--leading-tight);
+	letter-spacing: var(--tracking-tight);
+	color: var(--color-text);
+}
+
+/* Reading measure for README prose; tables, code and diagrams keep the column's width. */
+.sl-markdown-content :is(p, ul, ol, blockquote, details):not(:where(.not-content *)) {
+	max-width: var(--measure);
+}
+
+/* Diagrams: their natural size at most (Mermaid's inline max-width), the column's width on
+   narrow screens. */
+.diagram {
+	margin-inline: 0;
+}
+.diagram > svg {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+/* Starlight's LinkButton as peqa.ai's call to action: square, mono, full touch height. */
+.sl-link-button {
+	justify-content: center;
+	min-height: var(--touch-target);
+	padding: var(--space-3) var(--space-5);
+	border-radius: var(--radius);
+	font-family: var(--font-mono);
+	font-size: var(--text-xs);
+	line-height: var(--leading-tight);
+	transition:
+		background var(--motion-duration) var(--motion-ease),
+		border-color var(--motion-duration) var(--motion-ease),
+		color var(--motion-duration) var(--motion-ease);
+}
+.sl-link-button:focus-visible {
+	outline-offset: var(--focus-offset);
+}
+.sl-link-button:active {
+	opacity: var(--press-opacity);
+}
+.sl-link-button.primary {
+	background: var(--color-accent);
+	border-color: var(--color-accent);
+	color: var(--color-on-accent);
+}
+.sl-link-button.primary:hover {
+	background: var(--color-text);
+	border-color: var(--color-text);
+	color: var(--color-on-accent);
+}
+.sl-link-button.secondary {
+	border-color: var(--color-border-strong);
+	color: var(--color-text);
+}
+.sl-link-button.secondary:hover {
+	border-color: var(--color-text);
+	color: var(--color-text);
+}
+
+/* peqa.ai's square corners (--radius) on Starlight's rounded controls. */
+:is(
+		site-search button[data-open-modal],
+		site-search button > kbd,
+		site-search dialog,
+		starlight-menu-button button,
+		mobile-starlight-toc .toggle,
+		.sidebar-content a,
+		.pagination-links a,
+		starlight-toc a,
+		.expressive-code .copy button
+	) {
+	border-radius: var(--radius);
+}
+#starlight__search {
+	--sl-search-corners: var(--radius);
+	--pagefind-ui-border-radius: var(--radius);
+}

@@ -1,0 +1,10 @@
+{
+	"peqa.install.title": "Install the plugin",
+	"peqa.install.then": "Then, in a new session:",
+	"peqa.language.label": "Versión en español",
+	"peqa.language.href": "/",
+	"peqa.language.lang": "es",
+	"expressiveCode.copyButtonTooltip": "Copy to clipboard",
+	"expressiveCode.copyButtonCopied": "Copied!",
+	"expressiveCode.terminalWindowFallbackTitle": "Terminal window"
+}

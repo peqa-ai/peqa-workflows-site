@@ -1,0 +1,64 @@
+---
+// The site title in peqa.ai's brand signature (website src/components/Brand.js): lowercase
+// glyphs, the suffix in the accent and a caret. Screen readers hear the title as configured.
+const { siteTitle, siteTitleHref } = Astro.locals.starlightRoute;
+const [lead, ...rest] = siteTitle.toLowerCase().split(' ');
+---
+
+<a href={siteTitleHref} class="site-title">
+	<span class="sr-only">{siteTitle}</span>
+	<span class="brand" aria-hidden="true" translate="no">
+		<span class="glyphs">{lead} <span class="suffix">{rest.join(' ')}</span></span>
+		<span class="caret"></span>
+	</span>
+</a>
+
+<style>
+	.site-title {
+		display: inline-flex;
+		align-items: center;
+		min-width: 0;
+		min-height: var(--touch-target);
+		color: var(--color-text);
+		text-decoration: none;
+	}
+	.brand {
+		display: inline-flex;
+		align-items: flex-end;
+		font-family: var(--font-brand);
+		font-weight: var(--weight-title);
+		font-size: var(--text-md);
+		line-height: var(--brand-leading);
+		white-space: nowrap;
+	}
+	.glyphs {
+		padding-block: var(--brand-mask-top) var(--brand-mask-bottom);
+		letter-spacing: var(--brand-tracking);
+	}
+	.suffix {
+		color: var(--color-accent);
+	}
+	.caret {
+		flex: 0 0 var(--brand-caret-width);
+		height: var(--brand-caret-height);
+		margin-left: var(--brand-caret-gap);
+		margin-bottom: var(--brand-caret-bottom);
+		background: var(--color-accent);
+		transition: background var(--motion-duration) var(--motion-ease);
+	}
+	.site-title:hover .caret {
+		background: var(--color-text);
+	}
+	.site-title:active {
+		opacity: var(--press-opacity);
+	}
+	.site-title:focus-visible {
+		outline-offset: var(--focus-offset);
+	}
+	/* Token --breakpoint-nav: the header grows with Starlight's larger nav. */
+	@media (min-width: 50em) {
+		.brand {
+			font-size: var(--text-lg);
+		}
+	}
+</style>

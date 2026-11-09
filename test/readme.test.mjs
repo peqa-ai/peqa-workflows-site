@@ -5,6 +5,9 @@ import {
 	assertSafeMarkdown,
 	buildAnchorMap,
 	buildSite,
+	escapeDestination,
+	isSafeUrl,
+	parseMarkdown,
 	extractInstall,
 	extractSkills,
 	resolveUrl,
@@ -245,6 +248,53 @@ describe('assertSafeMarkdown', () => {
 		]) {
 			assert.throws(() => assertSafeMarkdown(page(bad)), SyncError, bad);
 		}
+	});
+
+	test('reads protocols as a browser does: tabs, line breaks, case and spacing', () => {
+		for (const url of ['java\tscript:alert(1)', 'java\nscript:alert(1)', 'java\rscript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,x', 'vbscript:x']) {
+			assert.equal(isSafeUrl(url), false, JSON.stringify(url));
+		}
+		for (const url of ['https://x.dev/a b', '/docs/', 'skills/dirige/SKILL.md#x', '#ancla', 'mailto:a@b.c', '//x.dev']) {
+			assert.equal(isSafeUrl(url), true, JSON.stringify(url));
+		}
+		for (const bad of [
+			'<a href=java&#x09;script:alert(1)>x</a>',
+			'<a href="java&#10;script:alert(1)">x</a>',
+			'<a HREF = "java&#13;script:alert(1)">x</a>',
+			'| a |\n| - |\n| <a href=java&#x09;script:alert(1)>x</a> |',
+			'- <a href=java&#x09;script:alert(1)>x</a>',
+			'[x](java&#9;script:alert(1))',
+		]) {
+			assert.throws(() => assertSafeMarkdown(page(bad)), SyncError, bad);
+		}
+	});
+
+	test('rewriting never turns an accepted destination into markup', () => {
+		const payloads = [
+			'[x](https://example.com/&#60;img&#32;src=x&#32;onerror=alert&#40;1&#41;&#62;)',
+			'[x](skills/dirige/SKILL.md#&#60;img&#32;src=x&#32;onerror=alert&#40;1&#41;&#62;)',
+			'[x](skills/&#60;img&#32;src=x&#32;onerror=alert&#40;1&#41;&#62;)',
+			'![i](docs/&#60;img&#32;src=x&#32;onerror=alert&#40;1&#41;&#62;.png)',
+			'[x][r]\n\n[r]: skills/dirige/SKILL.md#&#60;script&#62;x&#60;/script&#62;',
+			'<a href="skills/dirige/SKILL.md#&#34;&#62;&#60;img src=x onerror=alert(1)&#62;">x</a>',
+		];
+		for (const payload of payloads) {
+			const { pages } = buildSite({ readme: `${README}\n\n## Prueba\n\n${payload}\n`, release: RELEASE, repo: REPO, paths: PATHS, editUrl: '', introLabel: 'Introducción' });
+			const body = pages.find((entry) => entry.slug === 'prueba').content.replace(/^---\n[\s\S]*?\n---\n/, '');
+			const htmlNodes = [];
+			const visit = (node) => {
+				if (node.type === 'html') htmlNodes.push(node.value);
+				for (const child of node.children ?? []) visit(child);
+			};
+			visit(parseMarkdown(body));
+			const allowed = payload.startsWith('<a ') ? ['</a>'] : [];
+			assert.deepEqual(htmlNodes.filter((value) => !value.startsWith('<a href="https://github.com/')), allowed, payload);
+		}
+	});
+
+	test('escapes what could close a destination or start markup', () => {
+		assert.equal(escapeDestination('a b<c>"d\'e(f)`g'), 'a%20b%3Cc%3E%22d%27e%28f%29%60g');
+		assert.equal(escapeDestination('x&#60;y&amp;z?a=1&b=2'), 'x%26#60;y%26amp;z?a=1&b=2');
 	});
 
 	test('stops buildSite before any page is generated', () => {

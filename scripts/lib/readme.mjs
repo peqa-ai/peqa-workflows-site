@@ -115,6 +115,17 @@ export function docsUrl({ page, hash }) {
 const encodePath = (path) => path.split('/').map(encodeURIComponent).join('/');
 
 /**
+ * Makes a rewritten destination safe to write back into Markdown or an HTML attribute: the
+ * README's destinations arrive decoded (entities included), so anything that could close the
+ * destination or start markup is percent-encoded, as is an «&» that would read as an entity.
+ */
+export function escapeDestination(url) {
+	return url
+		.replace(/[\u0000-\u0020\u007F<>"'`()\\{}|^]/g, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0')}`)
+		.replace(/&(?=#?[a-z0-9]+;)/gi, '%26');
+}
+
+/**
  * Resolves one README link or image destination for the site.
  * Returns `{ url, warning? }`; throws a SyncError for anchors that match no heading.
  */
@@ -152,7 +163,7 @@ export function resolveUrl(raw, { kind = 'link', repo, tag, anchors, paths }) {
 	}
 
 	const type = paths.get(normalized);
-	const suffix = hash ? `#${hash}` : '';
+	const suffix = hash ? `#${escapeDestination(hash)}` : '';
 	const segment = type === 'tree' || (!type && pathPart.endsWith('/')) ? 'tree' : 'blob';
 	const resolved = { url: `https://github.com/${repo}/${segment}/${tag}/${encodePath(normalized)}${suffix}` };
 	if (!type) resolved.warning = `El README enlaza a «${raw}», que no existe en ${tag}.`;
@@ -213,9 +224,9 @@ export function rewriteLinks(markdown, context) {
 			const kind = node.type === 'image' ? 'image' : 'link';
 			const { url, warning } = resolveUrl(node.url, { ...context, kind });
 			if (warning) warnings.push(warning);
-			const needsAngle = range.angle || /[\s()<>]/.test(url);
-			const text = needsAngle && !range.angle ? `<${url}>` : url;
-			edits.push({ start: range.start, end: range.end, text });
+			// A destination that stays the same keeps its original text, entities included.
+			if (url === node.url) return;
+			edits.push({ start: range.start, end: range.end, text: escapeDestination(url) });
 		} else if (node.type === 'html') {
 			const start = node.position.start.offset;
 			const html = markdown.slice(start, node.position.end.offset);
@@ -223,8 +234,9 @@ export function rewriteLinks(markdown, context) {
 				const kind = match[1] === 'src' ? 'image' : 'link';
 				const { url, warning } = resolveUrl(match[3], { ...context, kind });
 				if (warning) warnings.push(warning);
+				if (url === match[3]) continue;
 				const valueStart = start + match.index + match[1].length + 2;
-				edits.push({ start: valueStart, end: valueStart + match[3].length, text: url });
+				edits.push({ start: valueStart, end: valueStart + match[3].length, text: escapeDestination(url) });
 			}
 		}
 	});
@@ -347,7 +359,8 @@ export function extractSkills(markdown, context) {
 export function describe(markdown) {
 	const paragraph = parseMarkdown(markdown).children.find((node) => node.type === 'paragraph');
 	if (!paragraph) return null;
-	const text = toString(paragraph).replace(/\s+/g, ' ').trim();
+	// Text only: inline HTML stays out of the meta description.
+	const text = toString(paragraph, { includeHtml: false }).replace(/\s+/g, ' ').trim();
 	const sentence = text.match(/^.+?[.!?](?=\s|$)/)?.[0] ?? text;
 	if (sentence.length <= 200) return sentence;
 	return `${sentence.slice(0, sentence.lastIndexOf(' ', 197))}…`;
@@ -397,11 +410,19 @@ const SAFE_ATTRIBUTES = new Set([
 ]);
 const URL_ATTRIBUTES = new Set(['href', 'src', 'srcSet']);
 
-/** True for relative URLs and for http(s) and mailto; false for javascript:, data: and the rest. */
+/**
+ * True for relative URLs and for http(s) and mailto; false for javascript:, data: and the rest.
+ * Browsers drop tabs and line breaks inside a URL («java\tscript:»), so any control character
+ * fails, and the protocol is the one the WHATWG URL parser reads, as a browser would.
+ */
 export function isSafeUrl(value) {
-	const url = String(value).trim();
-	const scheme = url.match(/^([a-z][a-z0-9+.-]*):/i);
-	return !scheme || ['http', 'https', 'mailto'].includes(scheme[1].toLowerCase());
+	const url = String(value);
+	if (/[\u0000-\u001F\u007F]/.test(url)) return false;
+	try {
+		return ['http:', 'https:', 'mailto:'].includes(new URL(url.trim(), 'https://relative.invalid/').protocol);
+	} catch {
+		return false;
+	}
 }
 
 /** Throws a SyncError naming the first unsafe HTML or link destination of the README. */
@@ -438,6 +459,9 @@ export function buildSite({ readme, release, repo, paths, editUrl, introLabel })
 	const install = extractInstall(readme);
 	const skills = extractSkills(readme, context);
 	const { markdown: rewritten, warnings } = rewriteLinks(readme, context);
+	// The rewritten Markdown is what the pages carry: check it again, so a rewrite can never
+	// turn an accepted destination into markup.
+	assertSafeMarkdown(rewritten);
 	const split = splitReadme(rewritten);
 
 	const definitions = [];

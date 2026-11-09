@@ -67,9 +67,21 @@ export function playOnView(elements: Story[], { endsIn }: { endsIn?: (element: S
 			observer.disconnect();
 			resized?.disconnect();
 			removeEventListener('resize', check);
+			removeEventListener('scroll', scrolled);
+			cancelAnimationFrame(frame);
 		};
 		const check = () => {
 			if (endingShownNow(end)) start();
+		};
+		// The observer reports only when a 5 % share is crossed, and the 60 % of the screen can be
+		// reached between two of them: while the story waits, each scroll also checks once per frame.
+		let frame = 0;
+		const scrolled = () => {
+			if (frame) return;
+			frame = requestAnimationFrame(() => {
+				frame = 0;
+				check();
+			});
 		};
 		const observer = new IntersectionObserver(
 			(entries) => {
@@ -84,5 +96,6 @@ export function playOnView(elements: Story[], { endsIn }: { endsIn?: (element: S
 		observer.observe(end);
 		resized?.observe(end);
 		addEventListener('resize', check);
+		addEventListener('scroll', scrolled, { passive: true });
 	}
 }

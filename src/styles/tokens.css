@@ -56,6 +56,9 @@
 
 	--border-width: 1px;
 	--focus-width: 2px;
+	/* The rule at the edge of a block that scrolls sideways while more of it lies past that edge
+	   (theme.css .scroll-edges). Source: round 3 of scoring, a 2 px rule. */
+	--scroll-edge-width: 2px;
 	--focus-offset: 4px;
 	--touch-target: 44px;
 	--radius: 0;
@@ -131,11 +134,12 @@
 	   its text would fall below 0.76 of the reader's text size, since an image's text does not
 	   follow the reader's text preference (repeated in @container). Source: round 1 of scoring. */
 	--breakpoint-scene: 17.875em;
-	/* How far a note travels in the memoria figures (into its tray, out of its stack), in
-	   scene units. Source: the figures' drawing. */
+	/* How far the relevant note travels out of its stack in memoria-extraer, in scene units.
+	   Source: the figure's drawing. */
 	--scene-shift: 80px;
-	/* Skill figures: their width beside the text of a wide ledger, and beside the skill's name
-	   when the ledger stacks. Source: the 160 × 80 drawing at about 1 and 0.7 px per unit. */
+	/* Skill figures: the box of the widest drawing (160 × 80 units) beside the text of a wide
+	   ledger, and beside the skill's name when the ledger stacks; each drawing is as high and
+	   as wide as it draws. Source: the drawings at about 1 and 0.7 px per unit. */
 	--skill-figure-width: 10rem;
 	--skill-figure-width-compact: 7rem;
 	/* A figure tells its story while it scrolls from fully entered at the bottom of the screen

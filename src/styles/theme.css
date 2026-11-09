@@ -61,15 +61,16 @@ h1#_top,
 }
 
 /* Blocks that scroll sideways rather than break a command (the install commands and their
-   invocation): as on the diagrams, a shadow shows at an edge only while there is more to
-   scroll to that side. Local backgrounds in the block's own color cover it at either end, so
-   a block that fits shows none. */
-.scroll-shadows {
+   invocation): an edge shows a rule in the muted text color (over 3:1 on the block) while there
+   is more of the command past it. Local backgrounds in the block's own color cover the rule at
+   either end of the scroll, so a block that fits shows none. The technique of the diagrams'
+   shadows, with a rule that reads at a glance. */
+.scroll-edges {
 	background:
-		linear-gradient(to right, var(--color-code-bg), transparent) left / var(--space-6) 100% no-repeat local,
-		linear-gradient(to left, var(--color-code-bg), transparent) right / var(--space-6) 100% no-repeat local,
-		radial-gradient(farthest-side at 0 50%, var(--color-border), transparent) left / var(--space-3) 100% no-repeat scroll,
-		radial-gradient(farthest-side at 100% 50%, var(--color-border), transparent) right / var(--space-3) 100% no-repeat scroll,
+		linear-gradient(var(--color-code-bg), var(--color-code-bg)) left / var(--space-2) 100% no-repeat local,
+		linear-gradient(var(--color-code-bg), var(--color-code-bg)) right / var(--space-2) 100% no-repeat local,
+		linear-gradient(var(--color-text-muted), var(--color-text-muted)) left / var(--scroll-edge-width) 100% no-repeat scroll,
+		linear-gradient(var(--color-text-muted), var(--color-text-muted)) right / var(--scroll-edge-width) 100% no-repeat scroll,
 		var(--color-code-bg);
 }
 

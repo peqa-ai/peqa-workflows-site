@@ -41,7 +41,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 							{client.command.split('\n').map((command, index) => <InstallCommand {command} number={index + 1} />)}
 						</div>
 						<p class="then">
-							{Astro.locals.t('peqa.install.then')} <code class="scroll-shadows">{client.invoke}</code>
+							{Astro.locals.t('peqa.install.then')} <code class="scroll-edges">{client.invoke}</code>
 						</p>
 					</TabItem>
 				))
@@ -201,7 +201,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		.with-scene .scene {
 			grid-area: scene;
 			align-self: center;
-			--hero-scene-margin: auto 0;
+			--hero-scene-justify: flex-end;
 		}
 	}
 </style>

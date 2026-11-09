@@ -62,9 +62,10 @@
 	stroke-width: var(--scene-stroke-strong);
 }
 /* Roles of the scene's buttons and states. An outlined button is an action being pressed. The
-   decisive step (lit) ends filled in ink, so the only filled accent on the first screen is the
-   page's real button; the tap on it is the accent of that moment. An accent outline (tag) is a
-   resulting status. */
+   decisive step (lit) is filled in ink when pressed, so the only filled accent on the first
+   screen is the page's real button; the tap on it is the accent of that moment. An outline
+   (tag) is a resulting status: in the accent for a check that passed («Sin hallazgos»), in ink
+   (tag-ink) for the state the story ends in («Mezclado»). */
 .scene-art .button {
 	fill: var(--scene-panel);
 	stroke: var(--color-text);
@@ -80,6 +81,12 @@
 	font-weight: var(--scene-weight-strong);
 	fill: var(--color-accent);
 }
+.scene-art .tag.tag-ink {
+	stroke: var(--color-text);
+}
+.scene-art .tag-text.tag-ink {
+	fill: var(--color-text);
+}
 .scene-art .small {
 	font-size: var(--scene-label);
 }
@@ -91,7 +98,7 @@
 	font-size: var(--scene-strong);
 	font-weight: var(--scene-weight-strong);
 }
-/* The guarded step ends switched on, in ink, with its label at the size of the scene's other
+/* The guarded step switches on in ink, with its label at the size of the scene's other
    labels. */
 .scene-art .lit {
 	fill: var(--color-text);
@@ -104,7 +111,8 @@
 	font-weight: var(--weight-normal);
 	fill: var(--color-on-accent);
 }
-/* Seen only while a story plays: a working mark, a scan, a tap. */
+/* Seen only while a story plays: a working mark, a state about to change, the buttons of a
+   decision, a scan, a tap. */
 .scene-art :is(.interim, .scan, .tap) {
 	opacity: 0;
 }
@@ -145,6 +153,11 @@
 	fill: var(--color-text);
 	stroke: var(--color-text);
 }
+.skill-figure .swatch-line {
+	fill: none;
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke);
+}
 .skill-figure .swatch-panel {
 	fill: var(--scene-panel);
 	stroke: var(--scene-icon);
@@ -171,6 +184,7 @@
 .scene-art .b5 { --beat: 5; }
 .scene-art .b6 { --beat: 6; }
 .scene-art .b7 { --beat: 7; }
+.scene-art .b8 { --beat: 8; }
 .scene-art .span2 { --span: 2; }
 .scene-art .s1 { --step: 0; }
 .scene-art .s2 { --step: 1; }
@@ -290,10 +304,10 @@
 		transform: translateY(var(--scene-scan));
 	}
 }
-/* A note moving to its place from the right. */
-@keyframes scene-shift {
+/* A note dropping into its place from above. */
+@keyframes scene-drop {
 	from {
-		transform: translateX(var(--scene-shift));
+		transform: translateY(calc(var(--scene-rise) * -3));
 	}
 }
 /* A note coming out to the right of where it was. */
@@ -341,7 +355,7 @@
    (data-motion="scroll"), or "waiting" and then "run" to play once in time where scroll
    timelines are missing (data-motion="time"). */
 @media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
-	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .shift, .shift-in) {
+	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
 		animation-fill-mode: both;
 	}
 	/* A dash as long as the stroke and a longer gap, so the hidden stroke leaves no sliver. */
@@ -355,7 +369,7 @@
 	.skill-figure[data-play] .outline { animation-name: scene-outline; }
 	.skill-figure[data-play] .accent-fill { animation-name: scene-accent; }
 	.skill-figure[data-play] .scan { animation-name: scene-scan; }
-	.skill-figure[data-play] .shift { animation-name: scene-shift; }
+	.skill-figure[data-play] .drop { animation-name: scene-drop; }
 	.skill-figure[data-play] .shift-in { animation-name: scene-shift-in; }
 
 	/* With the scroll: the figure's own view timeline drives its parts, forward and back. A
@@ -364,7 +378,7 @@
 		.skill-figure[data-play='scroll'] {
 			view-timeline: --skill-figure block;
 		}
-		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .shift, .shift-in) {
+		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
 			animation-duration: auto;
 			animation-timing-function: linear;
 			animation-timeline: --skill-figure;
@@ -374,7 +388,7 @@
 	}
 
 	/* In time: the figure waits on its first frame, then plays its story once. */
-	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .shift, .shift-in) {
+	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
 		animation-duration: calc(var(--span, 1) * var(--scene-beat));
 		animation-timing-function: var(--scene-ease);
 		animation-delay: calc((var(--step, 0) + var(--lag, 0) / 4) * var(--scene-beat));

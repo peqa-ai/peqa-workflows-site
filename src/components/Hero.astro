@@ -1,8 +1,9 @@
 ---
 // Replaces Starlight's Hero on the splash landings: the headline, one sentence and the actions
 // from the page's frontmatter and, on pages with `install: true`, the install commands of the
-// latest release below them (tabs per client) and the scene of the plugin at work beside them.
-// Starlight's 404 page also uses this hero, without commands or scene.
+// latest release below them (tabs per client) and the scene of the plugin at work: beside them
+// on a wide hero, after them in one column. Starlight's 404 page also uses this hero, without
+// commands or scene.
 import { LinkButton, TabItem, Tabs } from '@astrojs/starlight/components';
 import InstallCommand from './InstallCommand.astro';
 import Scene from './Scene.astro';
@@ -30,11 +31,6 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		</div>
 	</div>
 	{clients.length > 0 && (
-	<div class="scene">
-		<Scene />
-	</div>
-	)}
-	{clients.length > 0 && (
 	<section class="install" aria-labelledby="install">
 		<h2 id="install">{Astro.locals.t('peqa.install.title')}</h2>
 		<Tabs syncKey="peqa-client">
@@ -52,6 +48,11 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 			}
 		</Tabs>
 	</section>
+	)}
+	{clients.length > 0 && (
+	<div class="scene">
+		<Scene />
+	</div>
 	)}
 </div>
 </div>
@@ -77,6 +78,9 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		letter-spacing: var(--tracking-tight);
 		color: var(--color-text);
 		text-wrap: balance;
+		/* Only a word wider than the column, as with text at 200 % at 320 px, breaks instead of
+		   widening the page; other lines break as before. */
+		overflow-wrap: anywhere;
 	}
 	.tagline {
 		max-width: var(--measure);
@@ -89,6 +93,10 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		flex-wrap: wrap;
 		align-items: center;
 		gap: var(--space-3) var(--space-5);
+	}
+	/* As the headline: a label wider than the column wraps inside its button. */
+	.actions :global(.sl-link-button) {
+		overflow-wrap: anywhere;
 	}
 	/* Below Starlight's nav breakpoint, pages without sidebar have no language picker. */
 	.language {
@@ -158,6 +166,13 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 	.scene {
 		min-width: 0;
 	}
+	/* Token --breakpoint-scene: a column too narrow for the scene at its smallest unit, as a
+	   phone with text at 200 %, hides it. Its text would not grow with the reader's. */
+	@container hero (max-width: 17.875em) {
+		.scene {
+			display: none;
+		}
+	}
 	/* Token --breakpoint-hero: two columns. */
 	@container hero (min-width: 60em) {
 		.hero {
@@ -185,8 +200,6 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		.with-scene .scene {
 			grid-area: scene;
 			align-self: center;
-			display: flex;
-			justify-content: flex-end;
 			--hero-scene-unit: var(--scene-unit-hero);
 		}
 	}

@@ -66,6 +66,15 @@ describe('skill figures', () => {
 		}
 	});
 
+	test('every final frame starts at the same x, so the figures share their left edge', () => {
+		// A part's left edge: a rect's x, a line's x1 or the x of a path's first point.
+		const left = ([, , attrs]) => attrs.x ?? attrs.x1 ?? (attrs.d ? Number(/^M\s*(-?[\d.]+)/.exec(attrs.d)?.[1]) : undefined);
+		for (const [name, parts] of Object.entries(skillFigures)) {
+			const edges = partsOf(parts).map(left).filter((x) => x !== undefined);
+			assert.equal(Math.min(...edges), 12, name);
+		}
+	});
+
 	test('a drawn stroke is a path or a line, and groups nest one level at most', () => {
 		for (const [name, parts] of Object.entries(skillFigures)) {
 			for (const [tag, className] of partsOf(parts)) {

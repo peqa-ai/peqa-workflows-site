@@ -5,7 +5,9 @@
 // A figure is a list of SVG parts in its 160 × 80 drawing: [tag, classes, attributes] or, for
 // a group, [tag, classes, attributes, parts]. Roles and motion live in src/styles/scene.css.
 // `s1`–`s4` name the story step at which a part plays, `lag0`–`lag2` its place in a stagger
-// inside that step and `long` a part that lasts two steps. The markup is the final frame.
+// inside that step and `long` a part that lasts two steps. The markup is the final frame, and
+// every final frame starts at x = 12, so the figures share their left edge in the ledger. The
+// accent marks only each story's result.
 
 /** @typedef {[string, string, Record<string, string | number>, Part[]?]} Part */
 
@@ -79,19 +81,19 @@ export const skillFigures = {
 		['rect', 'slot', { x: 144, y: 34, width: 12, height: 12 }],
 	],
 	// A note, its approval, then it moves into the pull request's tray, outlined in the accent.
-	// The note is drawn in the tray, where it ends; it starts --scene-shift to the left.
+	// The note is drawn in the tray, where it ends; it starts --scene-shift to the right.
 	'memoria-guardar': [
-		['path', 'slot outline result s4', { d: 'M86 34V74H146V34' }],
+		['path', 'slot outline result s4', { d: 'M12 34V74H72V34' }],
 		[
 			'g',
 			'shift s3',
 			{},
 			[
-				['rect', 'frame enter s1', { x: 96, y: 18, width: 40, height: 48 }],
-				['path', 'line enter s1', { d: 'M104 30H128' }],
-				['path', 'line enter s1', { d: 'M104 40H124' }],
-				['path', 'line enter s1', { d: 'M104 50H120' }],
-				['path', 'accent-line draw s2', { d: 'M124 12l4 4 8-9' }],
+				['rect', 'frame enter s1', { x: 22, y: 18, width: 40, height: 48 }],
+				['path', 'line enter s1', { d: 'M30 30H54' }],
+				['path', 'line enter s1', { d: 'M30 40H50' }],
+				['path', 'line enter s1', { d: 'M30 50H46' }],
+				['path', 'check draw s2', { d: 'M50 12l4 4 8-9' }],
 			],
 		],
 	],

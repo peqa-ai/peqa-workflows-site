@@ -1,6 +1,7 @@
 // Texts of the hero scene (Scene.astro), copied as they are from peqa.ai's project sheet for
 // PEQA workflows: website src/data/work.js, scene `peqa-workflows` (2026-11-09). `label` tells
 // the scene's story to assistive technology. The request and the PR number are examples.
+// `pullRequest`, the header of the PR window, is this site's own (round 1 of scoring).
 type SceneCopy = {
 	label: string;
 	session: string;
@@ -10,6 +11,7 @@ type SceneCopy = {
 	agents: { name: string; file: string }[];
 	review: string;
 	noFindings: string;
+	pullRequest: string;
 	pr: string;
 	prTitle: string;
 	open: string;
@@ -33,6 +35,7 @@ export const sceneCopy: Record<'es' | 'en', SceneCopy> = {
 		],
 		review: 'Revisión 1 de 3',
 		noFindings: 'Sin hallazgos',
+		pullRequest: 'Pull request',
 		pr: 'PR #42',
 		prTitle: 'Exportación a CSV',
 		open: 'Abierto',
@@ -54,6 +57,7 @@ export const sceneCopy: Record<'es' | 'en', SceneCopy> = {
 		],
 		review: 'Review 1 of 3',
 		noFindings: 'No findings',
+		pullRequest: 'Pull request',
 		pr: 'PR #42',
 		prTitle: 'CSV export',
 		open: 'Open',

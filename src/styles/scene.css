@@ -55,6 +55,12 @@
 	stroke: var(--color-accent);
 	stroke-width: var(--scene-stroke-strong);
 }
+/* A finished task or an approval: a check in ink. The accent is kept for results. */
+.scene-art .check {
+	fill: none;
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke-strong);
+}
 /* Three roles of the accent, as on peqa.ai: the filled accent (lit) is the scene's one
    decisive step, an accent outline (tag) is a resulting status, and an outlined button is an
    action being pressed. */
@@ -111,11 +117,12 @@
 	transform-origin: center;
 }
 
-/* Skill figures: no text, only the theme's commit graph. Accent strokes are the work
-   advancing; squares are its nodes; an accent outline is the result. */
+/* Skill figures: no text, only the theme's commit graph. Its lines are the work advancing,
+   in the icon gray (4.3:1 on the page); squares are its nodes; the accent marks only the
+   result. */
 .skill-figure .flow {
 	fill: none;
-	stroke: var(--color-accent);
+	stroke: var(--scene-icon);
 	stroke-width: var(--scene-stroke);
 }
 .skill-figure .node {
@@ -280,12 +287,13 @@
 		transform: translateY(var(--scene-scan));
 	}
 }
-/* A note moving to its place from the left. */
+/* A note moving to its place from the right. */
 @keyframes scene-shift {
 	from {
-		transform: translateX(calc(var(--scene-shift) * -1));
+		transform: translateX(var(--scene-shift));
 	}
 }
+/* A note coming out to the right of where it was. */
 @keyframes scene-shift-in {
 	from {
 		opacity: 0;
@@ -293,8 +301,8 @@
 	}
 }
 
-/* The hero scene: the page's one sequence that plays without anyone acting, once, on load.
-   Screens only, so a page printed before it ends shows the final frame. */
+/* The hero scene: the page's one sequence that plays without anyone acting, once, on load or
+   as it comes into view. Screens only, so a page printed before it ends shows the final frame. */
 @media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
 	.hero-scene .enter {
 		animation: scene-enter var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
@@ -317,6 +325,11 @@
 	}
 	.hero-scene .tap {
 		animation: scene-tap calc(var(--scene-standard) * 2) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	/* A scene still below the screen at load waits on its first frame until it comes into
+	   view (play-on-view.ts sets data-play). */
+	.hero-scene[data-play='waiting'] * {
+		animation-play-state: paused;
 	}
 }
 

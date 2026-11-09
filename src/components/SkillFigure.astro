@@ -32,36 +32,20 @@ const attributes = (className: string, attrs: Record<string, string | number>) =
 </svg>
 
 <script>
+	import { belowScreen, playOnView, reducedMotion } from '../lib/play-on-view';
+
 	// Decides how the skill figures move (scene.css). data-motion records the mode: "scroll"
 	// where CSS has scroll timelines, "time" otherwise. Only a figure still below the screen
 	// moves, so one already visible keeps its final frame and never flickers. With the scroll
-	// (data-play="scroll") its story follows the scroll, forward and back. In time it waits on
-	// its first frame (data-play="waiting") until its top passes 80 % of the screen's height,
-	// then plays once ("run"). With reduced motion, or without IntersectionObserver in time
-	// mode, nothing moves.
+	// (data-play="scroll") its story follows the scroll, forward and back. In time it plays
+	// once as it comes into view (playOnView). With reduced motion nothing moves.
 	const figures = [...document.querySelectorAll<SVGSVGElement>('svg.skill-figure')];
-	if (figures.length && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+	if (figures.length && !reducedMotion()) {
 		const scroll = CSS.supports('animation-timeline: view()');
-		const below = figures.filter((figure) => figure.getBoundingClientRect().top >= innerHeight);
+		const below = figures.filter(belowScreen);
 		for (const figure of figures) figure.dataset.motion = scroll ? 'scroll' : 'time';
-		if (scroll) {
-			for (const figure of below) figure.dataset.play = 'scroll';
-		} else if ('IntersectionObserver' in window) {
-			const observer = new IntersectionObserver(
-				(entries) => {
-					for (const entry of entries) {
-						if (!entry.isIntersecting || !(entry.target instanceof SVGSVGElement)) continue;
-						entry.target.dataset.play = 'run';
-						observer.unobserve(entry.target);
-					}
-				},
-				{ rootMargin: '0% 0% -20% 0%' },
-			);
-			for (const figure of below) {
-				figure.dataset.play = 'waiting';
-				observer.observe(figure);
-			}
-		}
+		if (scroll) for (const figure of below) figure.dataset.play = 'scroll';
+		else playOnView(below);
 	}
 </script>
 

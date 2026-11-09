@@ -1,7 +1,7 @@
 ---
 // One ledger row: `term` in the mono key column, the slot as its value. With a `figure` slot
-// (the skills) the row also shows a figure: in a third column beside the text on a wide ledger,
-// beside the key on a narrow one. Rows without it are unchanged.
+// (the skills) the row also shows a figure, right after the text's measure: in a third column
+// on a wide ledger, beside the key on a narrow one. Rows without it are unchanged.
 interface Props {
 	term: string;
 }
@@ -84,9 +84,11 @@ const figure = Astro.slots.has('figure');
 		}
 	}
 
-	/* Rows with a figure. Without subgrid the figure simply follows the text. */
+	/* Rows with a figure. Without subgrid the figure simply follows the text. The text keeps
+	   its own spacing however tall the figure beside it is. */
 	.value {
 		display: grid;
+		align-content: start;
 		gap: var(--space-2);
 		max-width: var(--measure);
 		min-width: 0;
@@ -98,9 +100,11 @@ const figure = Astro.slots.has('figure');
 	}
 	@supports (grid-template-columns: subgrid) {
 		/* A narrow ledger: the key and the figure share the first line, the text goes below.
-		   The value spans both lines as a subgrid, so it lets clicks through to the key. */
+		   Both columns together stay within the text's measure, so the figure ends where the
+		   text may. The value spans both lines as a subgrid, so it lets clicks through to the key. */
 		.row.with-figure {
-			grid-template-columns: minmax(0, 1fr) auto;
+			grid-template-columns: minmax(0, calc(var(--measure) - var(--skill-figure-width-compact) - var(--space-4))) auto;
+			justify-content: start;
 			align-items: center;
 		}
 		.with-figure > dt {
@@ -121,10 +125,11 @@ const figure = Astro.slots.has('figure');
 		.with-figure .figure {
 			grid-area: 1 / 2;
 		}
-		/* Token --ledger-figure-width: a wide ledger puts the figure in a third column. */
+		/* Token --ledger-figure-width: a wide ledger puts the figure in a third column, right
+		   after the text's measure; the rest of the row stays free. */
 		@container (min-width: 48rem) {
 			.row.with-figure {
-				grid-template-columns: var(--ledger-key-width) minmax(0, 1fr) auto;
+				grid-template-columns: var(--ledger-key-width) minmax(0, var(--measure)) auto;
 				align-items: baseline;
 			}
 			.with-figure > dd {

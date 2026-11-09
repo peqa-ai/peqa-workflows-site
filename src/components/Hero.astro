@@ -130,18 +130,19 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		font-size: var(--text-sm);
 		color: var(--color-text);
 	}
-	/* As peqa.ai's command arguments: the invocation moves to the next line whole and only
-	   breaks when it is wider than the line. */
+	/* As the install commands: the invocation moves to the next line whole and, if it is wider
+	   than the line, scrolls rather than breaking at a hyphen. */
 	.then code {
 		display: inline-block;
 		max-width: 100%;
+		overflow-x: auto;
+		white-space: nowrap;
 		vertical-align: bottom;
 		font-family: var(--font-mono);
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
 		background: var(--color-code-bg);
 		border: var(--border-width) solid var(--color-code-border);
-		overflow-wrap: anywhere;
 	}
 	/* The hero's width decides its columns, in its own em, so text at 200 % stacks them. */
 	.hero-frame {

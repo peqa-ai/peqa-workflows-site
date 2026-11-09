@@ -8,6 +8,8 @@ const token = loadTokens();
 
 export default defineEcConfig({
 	themes: ['min-dark'],
+	// Plain blocks, like the landing's install commands: no terminal title bar or dots.
+	defaultProps: { frame: 'none' },
 	customizeTheme: (theme) => {
 		// Monochrome code, as on peqa.ai: text in --color-text, comments in --color-text-muted,
 		// on the panel the page actually shows (Expressive Code checks contrast against it).

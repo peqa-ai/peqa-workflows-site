@@ -1,8 +1,9 @@
 ---
 // One install command with its copy button, ported from peqa.ai's InstallCommand (website
-// src/components/InstallCommand.js). Each argument wraps whole, so a narrow screen or larger
-// text moves «peqa-workflows@peqa» to the next line instead of cutting it or breaking it at a
-// hyphen; the button copies the command exactly as the README publishes it.
+// src/components/InstallCommand.js). The command wraps only between arguments, so a narrow
+// screen or larger text moves «peqa-workflows@peqa» to the next line whole; an argument wider
+// than the block scrolls inside it rather than breaking at a hyphen. The button copies the
+// command exactly as the README publishes it.
 interface Props {
 	command: string;
 	number: number;
@@ -89,6 +90,7 @@ const label = `${t('peqa.install.command')} ${number}`;
 		background: var(--color-code-bg);
 		border: var(--border-width) solid var(--color-code-border);
 		white-space: pre-wrap;
+		overflow-x: auto;
 	}
 	pre:focus-visible {
 		outline-offset: var(--focus-width);
@@ -99,13 +101,9 @@ const label = `${t('peqa.install.command')} ${number}`;
 		line-height: var(--leading-body);
 		color: var(--color-text);
 	}
-	/* An argument breaks only when it alone is wider than the line. */
+	/* An argument never breaks inside: a hyphen there would read as part of the command. */
 	.argument {
-		display: inline-block;
-		max-width: 100%;
-		white-space: normal;
-		overflow-wrap: anywhere;
-		vertical-align: top;
+		white-space: nowrap;
 	}
 	.status {
 		margin: 0;

@@ -126,6 +126,17 @@ h1#_top,
 	) {
 	border-radius: var(--radius);
 }
+/* Touch targets of Starlight's controls, as peqa.ai's: the search button (2.5rem high) and the
+   tabs reach --touch-target; a tab label stays on one line and the tab list scrolls instead. */
+site-search button[data-open-modal] {
+	min-height: var(--touch-target);
+	min-width: var(--touch-target);
+}
+starlight-tabs [role='tab'] {
+	min-height: var(--touch-target);
+	white-space: nowrap;
+}
+
 /* The phone menu button: square and outlined like «Ver en GitHub», not a filled circle. */
 .sl-menu-button {
 	background-color: var(--color-surface);

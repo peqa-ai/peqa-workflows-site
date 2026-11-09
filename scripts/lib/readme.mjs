@@ -208,14 +208,26 @@ function destinationRange(source, node) {
 	return { start: start + cursor, end: start + index, angle: false };
 }
 
+/** Backslash-escapes ASCII punctuation, so text written back into Markdown stays plain text. */
+const escapeMarkdownText = (text) => text.replace(/[!-/:-@[-`{-~]/g, '\\$&');
+
 /**
  * Rewrites every link, image, definition and HTML href/src of the README for the site,
  * changing only the destinations so the rest of the Markdown stays byte for byte.
+ *
+ * A reference image (`![alt][ref]`, `![alt][]`, `![alt]`) becomes an inline image with the raw
+ * file URL, because its definition is rewritten for links (the GitHub page). HTML attributes
+ * are found with the HTML parser, so case, spacing, quoting and entities read as a browser
+ * reads them.
  */
 export function rewriteLinks(markdown, context) {
 	const tree = parseMarkdown(markdown);
 	const edits = [];
 	const warnings = [];
+	const definitions = new Map();
+	walk(tree, (node) => {
+		if (node.type === 'definition' && !definitions.has(node.identifier)) definitions.set(node.identifier, node);
+	});
 
 	walk(tree, (node) => {
 		if (node.type === 'link' || node.type === 'image' || node.type === 'definition') {
@@ -227,17 +239,38 @@ export function rewriteLinks(markdown, context) {
 			// A destination that stays the same keeps its original text, entities included.
 			if (url === node.url) return;
 			edits.push({ start: range.start, end: range.end, text: escapeDestination(url) });
+		} else if (node.type === 'imageReference') {
+			const definition = definitions.get(node.identifier);
+			if (!definition) return;
+			const { url, warning } = resolveUrl(definition.url, { ...context, kind: 'image' });
+			if (warning) warnings.push(warning);
+			// Same destination as the rewritten definition (absolute URLs, anchors): nothing to do.
+			if (url === resolveUrl(definition.url, { ...context, kind: 'link' }).url) return;
+			const title = definition.title ? ` "${escapeMarkdownText(definition.title)}"` : '';
+			edits.push({
+				start: node.position.start.offset,
+				end: node.position.end.offset,
+				text: `![${escapeMarkdownText(node.alt ?? '')}](${escapeDestination(url)}${title})`,
+			});
 		} else if (node.type === 'html') {
 			const start = node.position.start.offset;
 			const html = markdown.slice(start, node.position.end.offset);
-			for (const match of html.matchAll(/\b(href|src)=(["'])(.*?)\2/g)) {
-				const kind = match[1] === 'src' ? 'image' : 'link';
-				const { url, warning } = resolveUrl(match[3], { ...context, kind });
-				if (warning) warnings.push(warning);
-				if (url === match[3]) continue;
-				const valueStart = start + match.index + match[1].length + 2;
-				edits.push({ start: valueStart, end: valueStart + match[3].length, text: escapeDestination(url) });
-			}
+			walk(fromHtml(html, { fragment: true, verbose: true }), (element) => {
+				if (element.type !== 'element') return;
+				for (const name of ['href', 'src']) {
+					const value = element.properties?.[name];
+					const where = element.data?.position?.properties?.[name];
+					if (typeof value !== 'string' || !where) continue;
+					const { url, warning } = resolveUrl(value, { ...context, kind: name === 'src' ? 'image' : 'link' });
+					if (warning) warnings.push(warning);
+					if (url === value) continue;
+					edits.push({
+						start: start + where.start.offset,
+						end: start + where.end.offset,
+						text: `${name}="${escapeDestination(url).replace(/&/g, '&amp;')}"`,
+					});
+				}
+			});
 		}
 	});
 

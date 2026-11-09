@@ -224,6 +224,57 @@ describe('extractInstall', () => {
 	});
 });
 
+describe('rewriting reference images and HTML attributes', () => {
+	const pageFor = (extra) => {
+		const { pages } = buildSite({ readme: `${README}\n\n## Prueba\n\n${extra}\n`, release: RELEASE, repo: REPO, paths: PATHS, editUrl: '', introLabel: 'Introducción' });
+		return pages.find((entry) => entry.slug === 'prueba').content.replace(/^---\n[\s\S]*?\n---\n/, '');
+	};
+	const raw = (path) => `https://raw.githubusercontent.com/${REPO}/${TAG}/${path}`;
+	const nodesOf = (markdown, type) => {
+		const found = [];
+		const visit = (node) => {
+			if (node.type === type) found.push(node);
+			for (const child of node.children ?? []) visit(child);
+		};
+		visit(parseMarkdown(markdown));
+		return found;
+	};
+
+	test('reference images point at the raw file in all three forms', () => {
+		for (const usage of ['![Diagrama][d]', '![d][]', '![d]']) {
+			const body = pageFor(`${usage}\n\n[d]: docs/flujo.png "Flujo"`);
+			const [image] = nodesOf(body, 'image');
+			assert.equal(image?.url, raw('docs/flujo.png'), usage);
+			assert.equal(image.title, 'Flujo', usage);
+		}
+	});
+
+	test('a definition shared by a link and an image serves each by its kind', () => {
+		const body = pageFor('[El flujo][d] y ![Diagrama *del* flujo][d]\n\n[d]: docs/flujo.png');
+		const [image] = nodesOf(body, 'image');
+		assert.equal(image.url, raw('docs/flujo.png'));
+		// The same alt text Markdown gives the original image (emphasis reads as plain text).
+		assert.equal(image.alt, 'Diagrama del flujo');
+		const [definition] = nodesOf(body, 'definition').filter((node) => node.identifier === 'd');
+		assert.equal(definition.url, blob('docs/flujo.png'));
+	});
+
+	test('HTML attributes are read as a browser reads them', () => {
+		for (const [html, expected] of [
+			['<a href="#instalar">Instalar</a>', 'href="/docs/instalar/"'],
+			['<a HREF="#instalar">Instalar</a>', 'href="/docs/instalar/"'],
+			['<a href = "#instalar">Instalar</a>', 'href="/docs/instalar/"'],
+			["<a href='#instalar'>Instalar</a>", 'href="/docs/instalar/"'],
+			['<a href=#instalar>Instalar</a>', 'href="/docs/instalar/"'],
+			['<a href="#dise&#241;o-de-interfaces">Diseño</a>', 'href="/docs/diseno-de-interfaces/"'],
+			['<img SRC = "docs/flujo.png" alt="Flujo">', `src="${raw('docs/flujo.png')}"`],
+			['<a href="https://peqa.ai/?a=1&amp;b=2">peqa.ai</a>', 'href="https://peqa.ai/?a=1&amp;b=2"'],
+		]) {
+			assert.ok(pageFor(html).includes(expected), `${html} → ${expected}`);
+		}
+	});
+});
+
 describe('assertSafeMarkdown', () => {
 	const page = (body) => `# T\n\n${body}\n`;
 

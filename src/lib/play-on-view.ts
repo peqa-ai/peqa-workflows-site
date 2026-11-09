@@ -11,25 +11,28 @@ export const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)'
 export const belowScreen = (element: Element) => element.getBoundingClientRect().top >= innerHeight;
 
 /**
- * Each element waits on its first frame (data-play="waiting") until its top passes 80 % of the
- * screen's height, then plays once ("run"). A story CSS had already started on load, as the
- * hero's, goes back to its first frame. Without IntersectionObserver nothing changes.
+ * Each element waits on its first frame (data-play="waiting"), then plays once ("run"). A
+ * story CSS had already started on load, as the hero's, goes back to its first frame. By
+ * default a story starts when its top passes 80 % of the screen's height. With `whole` it starts
+ * once it is almost all on screen, so its end is seen too: 90 % of it, or, if it is taller than
+ * the screen, enough of it to cover 60 % of the screen's height. Without IntersectionObserver
+ * nothing changes.
  */
-export function playOnView(elements: Story[]) {
-	if (!elements.length || !('IntersectionObserver' in window)) return;
-	const observer = new IntersectionObserver(
-		(entries) => {
-			for (const entry of entries) {
-				if (!entry.isIntersecting) continue;
-				(entry.target as Story).dataset.play = 'run';
-				observer.unobserve(entry.target);
-			}
-		},
-		{ rootMargin: '0% 0% -20% 0%' },
-	);
+export function playOnView(elements: Story[], { whole = false } = {}) {
+	if (!('IntersectionObserver' in window)) return;
 	for (const element of elements) {
 		element.dataset.play = 'waiting';
 		for (const animation of element.getAnimations({ subtree: true })) animation.currentTime = 0;
+		const height = element.getBoundingClientRect().height;
+		const threshold = !whole ? 0 : height <= innerHeight ? 0.9 : (0.6 * innerHeight) / height;
+		const observer = new IntersectionObserver(
+			(entries) => {
+				if (!entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= threshold - 0.01)) return;
+				element.dataset.play = 'run';
+				observer.disconnect();
+			},
+			whole ? { threshold } : { rootMargin: '0% 0% -20% 0%' },
+		);
 		observer.observe(element);
 	}
 }

@@ -92,6 +92,10 @@
 	--diagram-min-scale: 0.75;
 	/* Starlight's own breakpoint for the larger nav and headings (repeated in @media). */
 	--breakpoint-nav: 50em;
+	/* Below this width of a tab list, in its own em, its tabs no longer fit side by side and
+	   each takes the whole line (repeated in @container). Source: the install tabs, «Claude
+	   Code» and «Codex», measure about 14em together. */
+	--breakpoint-tabs: 14.5em;
 
 	/* Scenes (scene.css): the landing's SVG drawings. Motion follows peqa.ai's Corporate
 	   archetype: one curve, a short duration palette, no overshoot beyond 3 %. Source of the
@@ -107,6 +111,10 @@
 	--scene-label: 11px;
 	--scene-text: 13px;
 	--scene-strong: 16px;
+	/* Bold inside the scenes: the monospace's own bold, below the 800 of Neue Machina's
+	   titles, so «PR #42» and «Sin hallazgos» stay under the page's headings. Source: round 2
+	   of scoring. */
+	--scene-weight-strong: 700;
 	/* Strokes, in scene units: outlines, accent marks and placeholder text lines. */
 	--scene-stroke: 1.5px;
 	--scene-stroke-strong: 2px;
@@ -115,13 +123,10 @@
 	   12 px (peqa.ai src/components/Scene.js, EM_PER_UNIT = 1.1 / 16). The smallest unit the
 	   hero scene takes: below it, it hides (--breakpoint-scene). */
 	--scene-unit: 0.06875em;
-	/* The hero scene beside the headline: 1.2 px per unit, so its 11-unit labels read at about
-	   13 px and its 13-unit text at about 16 px, near the install commands (12.8 px), and
-	   «Sí, mezclar» does not outweigh the primary action. Source: round 1 of scoring. */
+	/* The hero scene's natural size, in one column or two: 1.2 px per unit, so its 11-unit
+	   labels read at about 13 px and its 13-unit text at about 16 px, near the install commands
+	   (12.8 px). A narrower column shrinks it. Source: rounds 1 and 2 of scoring. */
 	--scene-unit-hero: 0.075em;
-	/* The hero scene in one column takes the column's width up to this unit: it fills the
-	   358 px column of a 390 px phone. Source: round 1 of scoring (no gap beside it). */
-	--scene-unit-column: 0.0865em;
 	/* Below this hero width the scene hides: 260 units (its width) at --scene-unit. Narrower,
 	   its text would fall below 0.76 of the reader's text size, since an image's text does not
 	   follow the reader's text preference (repeated in @container). Source: round 1 of scoring. */

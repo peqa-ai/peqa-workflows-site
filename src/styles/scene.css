@@ -61,9 +61,10 @@
 	stroke: var(--color-text);
 	stroke-width: var(--scene-stroke-strong);
 }
-/* Three roles of the accent, as on peqa.ai: the filled accent (lit) is the scene's one
-   decisive step, an accent outline (tag) is a resulting status, and an outlined button is an
-   action being pressed. */
+/* Roles of the scene's buttons and states. An outlined button is an action being pressed. The
+   decisive step (lit) ends filled in ink, so the only filled accent on the first screen is the
+   page's real button; the tap on it is the accent of that moment. An accent outline (tag) is a
+   resulting status. */
 .scene-art .button {
 	fill: var(--scene-panel);
 	stroke: var(--color-text);
@@ -76,7 +77,7 @@
 }
 .scene-art .tag-text {
 	font-size: var(--scene-label);
-	font-weight: var(--weight-title);
+	font-weight: var(--scene-weight-strong);
 	fill: var(--color-accent);
 }
 .scene-art .small {
@@ -88,17 +89,19 @@
 }
 .scene-art .strong {
 	font-size: var(--scene-strong);
-	font-weight: var(--weight-title);
+	font-weight: var(--scene-weight-strong);
 }
-/* The guarded step ends switched on, in the accent. */
+/* The guarded step ends switched on, in ink, with its label at the size of the scene's other
+   labels. */
 .scene-art .lit {
-	fill: var(--color-accent);
-	stroke: var(--color-accent);
+	fill: var(--color-text);
+	stroke: var(--color-text);
 	transform-box: fill-box;
 	transform-origin: center;
 }
 .scene-art .lit-text {
-	font-weight: var(--weight-title);
+	font-size: var(--scene-label);
+	font-weight: var(--weight-normal);
 	fill: var(--color-on-accent);
 }
 /* Seen only while a story plays: a working mark, a scan, a tap. */
@@ -111,7 +114,7 @@
 }
 .scene-art .tap {
 	fill: none;
-	stroke: var(--color-text);
+	stroke: var(--color-accent);
 	stroke-width: var(--scene-stroke);
 	transform-box: fill-box;
 	transform-origin: center;

@@ -41,7 +41,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 							{client.command.split('\n').map((command, index) => <InstallCommand {command} number={index + 1} />)}
 						</div>
 						<p class="then">
-							{Astro.locals.t('peqa.install.then')} <code>{client.invoke}</code>
+							{Astro.locals.t('peqa.install.then')} <code class="scroll-shadows">{client.invoke}</code>
 						</p>
 					</TabItem>
 				))
@@ -94,8 +94,10 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		align-items: center;
 		gap: var(--space-3) var(--space-5);
 	}
-	/* As the headline: a label wider than the column wraps inside its button. */
+	/* A label wider than the column (320 px with text at 200 %) breaks with a hyphen where the
+	   page's language allows, and anywhere as a last resort, instead of widening the page. */
 	.actions :global(.sl-link-button) {
+		hyphens: auto;
 		overflow-wrap: anywhere;
 	}
 	/* Below Starlight's nav breakpoint, pages without sidebar have no language picker. */
@@ -156,7 +158,6 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		font-family: var(--font-mono);
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
-		background: var(--color-code-bg);
 		border: var(--border-width) solid var(--color-code-border);
 	}
 	/* The hero's width decides its columns, in its own em, so text at 200 % stacks them. */
@@ -182,7 +183,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 			padding-block: var(--section-space);
 		}
 		/* On the landings the headline, its actions and the install commands share the left
-		   column and the scene takes the right one, at its larger unit. */
+		   column and the scene takes the right one, against the content's right edge. */
 		.with-scene {
 			grid-template-areas:
 				'lead scene'
@@ -200,7 +201,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		.with-scene .scene {
 			grid-area: scene;
 			align-self: center;
-			--hero-scene-unit: var(--scene-unit-hero);
+			--hero-scene-margin: auto 0;
 		}
 	}
 </style>

@@ -2,7 +2,8 @@
 // The landing's hero scene, translated from peqa.ai's Scene.js (scene `peqa-workflows`) into
 // one vertical piece: the agent session above, the pull request below. It tells one story in
 // beats of --scene-beat (scene.css), once: b1 plays at the second beat. It starts on load or,
-// if it is still below the screen then, as it comes into view. The markup is the final frame.
+// if it is still below the screen then, once it is almost all in view. The markup is the final
+// frame.
 // Assistive technology reads the scene as one image described by its story.
 import { sceneCopy } from '../data/scene';
 import '../styles/scene.css';
@@ -47,7 +48,8 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 		}
 
 		{/* The pull request: it opens, revisa reviews it and the person decides the merge, the
-		    scene's one lit step. */}
+		    scene's one lit step: it ends filled in ink, tapped by an accent ring, so the page's
+		    real button stays the only filled accent on the first screen. */}
 		<rect class="screen" x="2" y="200" width="256" height="218" />
 		<text class="label" x="14" y="220">{t.pullRequest}</text>
 		<line class="rule" x1="2" y1="230" x2="258" y2="230" />
@@ -77,10 +79,10 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 	import { belowScreen, playOnView, reducedMotion } from '../lib/play-on-view';
 
 	// On a phone the scene follows the install commands, below the screen at load: it waits on
-	// its first frame there and plays as it comes into view. A hidden scene has no box, so it
-	// is never below the screen and stays as it is.
+	// its first frame there and plays once it is almost all in view, so its end is seen. A
+	// hidden scene has no box, so it is never below the screen and stays as it is.
 	const scene = document.querySelector<HTMLElement>('.hero-scene');
-	if (scene && !reducedMotion() && belowScreen(scene)) playOnView([scene]);
+	if (scene && !reducedMotion() && belowScreen(scene)) playOnView([scene], { whole: true });
 </script>
 
 <style>
@@ -89,12 +91,14 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 		min-width: 0;
 		font-size: var(--text-sm);
 	}
-	/* The column's width, up to 260 units (the drawing's width, its viewBox) at
-	   --scene-unit-column, or at the unit the hero passes in --hero-scene-unit. In em, so the
-	   scene grows with the reader's text; the hero hides it below --breakpoint-scene. */
+	/* At most its natural size, 260 units (the drawing's width, its viewBox) at
+	   --scene-unit-hero, centred in a wider column; a narrower column shrinks it. In em, so the
+	   scene grows with the reader's text; the hero hides it below --breakpoint-scene and may
+	   align it with --hero-scene-margin. */
 	svg {
 		width: 100%;
-		max-width: calc(260 * var(--hero-scene-unit, var(--scene-unit-column)));
+		max-width: calc(260 * var(--scene-unit-hero));
 		height: auto;
+		margin-inline: var(--hero-scene-margin, auto);
 	}
 </style>

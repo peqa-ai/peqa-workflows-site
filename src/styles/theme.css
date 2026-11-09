@@ -60,6 +60,19 @@ h1#_top,
 	height: auto;
 }
 
+/* Blocks that scroll sideways rather than break a command (the install commands and their
+   invocation): as on the diagrams, a shadow shows at an edge only while there is more to
+   scroll to that side. Local backgrounds in the block's own color cover it at either end, so
+   a block that fits shows none. */
+.scroll-shadows {
+	background:
+		linear-gradient(to right, var(--color-code-bg), transparent) left / var(--space-6) 100% no-repeat local,
+		linear-gradient(to left, var(--color-code-bg), transparent) right / var(--space-6) 100% no-repeat local,
+		radial-gradient(farthest-side at 0 50%, var(--color-border), transparent) left / var(--space-3) 100% no-repeat scroll,
+		radial-gradient(farthest-side at 100% 50%, var(--color-border), transparent) right / var(--space-3) 100% no-repeat scroll,
+		var(--color-code-bg);
+}
+
 .diagram-hint {
 	margin-top: var(--space-2);
 	font-size: var(--text-xs);
@@ -139,6 +152,18 @@ starlight-tabs [role='tab'] {
 }
 starlight-tabs [role='tablist'] {
 	flex-wrap: wrap;
+}
+/* The tab list's width decides, in its own em, so larger text stacks the tabs too. */
+starlight-tabs {
+	container-type: inline-size;
+}
+/* Token --breakpoint-tabs: stacked tabs each take the whole line, so their underlines have
+   the same length. */
+@container (max-width: 14.5em) {
+	starlight-tabs .tab,
+	starlight-tabs .tab > [role='tab'] {
+		flex: 1 1 100%;
+	}
 }
 
 /* The phone menu button: square and outlined like «Ver en GitHub», not a filled circle. */

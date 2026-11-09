@@ -21,7 +21,7 @@ const label = `${t('peqa.install.command')} ${number}`;
 			{t('peqa.install.copy')}
 		</button>
 	</div>
-	<pre tabindex="0" aria-label={label}><code>{command.split(' ').map((part, index) => <>{index > 0 ? ' ' : ''}<span class="argument">{part}</span></>)}</code></pre>
+	<pre class="scroll-shadows" tabindex="0" aria-label={label}><code>{command.split(' ').map((part, index) => <>{index > 0 ? ' ' : ''}<span class="argument">{part}</span></>)}</code></pre>
 	<p class="status" role="status" data-copied={t('peqa.install.copied')} data-failed={t('peqa.install.copyFailed')}></p>
 </div>
 
@@ -84,10 +84,10 @@ const label = `${t('peqa.install.command')} ${number}`;
 	.copy:focus-visible {
 		outline-offset: var(--focus-offset);
 	}
+	/* Its background, with the scroll shadows, comes from .scroll-shadows (theme.css). */
 	pre {
 		margin: 0;
 		padding: var(--space-3) var(--space-4);
-		background: var(--color-code-bg);
 		border: var(--border-width) solid var(--color-code-border);
 		white-space: pre-wrap;
 		overflow-x: auto;

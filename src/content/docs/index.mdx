@@ -20,8 +20,24 @@ import LandingSection from '../../components/LandingSection.astro';
 import Ledger from '../../components/Ledger.astro';
 import LedgerRow from '../../components/LedgerRow.astro';
 import LandingColumns from '../../components/LandingColumns.astro';
+import Point from '../../components/Point.astro';
+import Points from '../../components/Points.astro';
 import SkillScenes from '../../components/SkillScenes.astro';
 import { formatDate, release } from '../../lib/release';
+
+<LandingSection id="para-quien-es" title="Para quién es">
+	<Points>
+		<Point title="Para equipos">
+			Pensado para cómo trabaja una empresa, más que para quien programa solo.
+		</Point>
+		<Point title="Consistencia antes que velocidad">
+			Cada cambio termina en un PR con revisión independiente, y las decisiones del proyecto quedan en memorias que la siguiente sesión recupera. No busca ser lo más rápido.
+		</Point>
+		<Point title="Dile lo que quieres">
+			Hablas con <code>dirige</code> y él reparte el trabajo. El flujo es el mismo en T3 Code, Orca, Codex y Claude Code.
+		</Point>
+	</Points>
+</LandingSection>
 
 <LandingSection id="que-pedir" title="Qué le puedes pedir">
 	<SkillScenes />

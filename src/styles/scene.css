@@ -490,23 +490,49 @@
 		animation-play-state: paused;
 	}
 	/* With the scroll: where the scene starts below the first screen (a phone) and the browser
-	   has scroll timelines, the story follows the scene's way up the screen, forward and back,
-	   in place of the autonomous one. A beat is --hero-scroll-beat of scroll, counted from
-	   --hero-scroll-from of the scene showing; each part lasts what it lasts in time, in beats. */
-	@supports (animation-timeline: --hero) and (view-timeline: --hero block) and (animation-range-start: cover 1px) {
+	   has scroll timelines, the story follows the scroll, forward and back, in place of the
+	   autonomous one. Each window tells its part as it comes in: the session's beats (0 to 4)
+	   run over the session's own entrance into the screen, and the pull request's (4 to 8.6)
+	   over the pull request's, with the graph between them. A window's entrance is measured on
+	   the window itself, whatever its size and the screen's (its entry range: from its top at
+	   the foot of the screen to all of it in, or, taller than the screen, to its top at the top),
+	   so with any text size and orientation the story is whole before the pull request's center
+	   reaches the screen's, and no window gets to the middle of the screen empty. Each part
+	   lasts what it lasts in time, in beats. */
+	@supports (animation-timeline: --hero-session) and (view-timeline: --hero-session block) and (timeline-scope: --hero-session) and (animation-range-start: entry 1%) {
 		.hero-scene[data-play='scroll'] {
-			view-timeline: --hero block;
+			timeline-scope: --hero-session, --hero-pull-request;
+		}
+		.hero-scene[data-play='scroll'] .session {
+			view-timeline: --hero-session block;
+		}
+		.hero-scene[data-play='scroll'] .pull-request {
+			view-timeline: --hero-pull-request block;
 		}
 		.hero-scene[data-play='scroll'] :is(.enter, .slide, .lit, .lit-text, .type) { --part: 0.6; }
 		.hero-scene[data-play='scroll'] :is(.draw, .pulse) { --part: 1; }
 		.hero-scene[data-play='scroll'] :is(.interim, .breathe) { --part: var(--span, 1); }
 		.hero-scene[data-play='scroll'] .tap { --part: 1.2; }
+		.hero-scene[data-play='scroll'] .session :is(.enter, .type, .interim, .breathe) {
+			--phase: calc(var(--beat, 0) / 4);
+			--phase-len: calc(var(--part, 1) / 4);
+			animation-timeline: --hero-session;
+		}
+		.hero-scene[data-play='scroll'] .pull-request :is(.enter, .slide, .lit, .lit-text, .interim, .tap) {
+			--phase: calc((var(--beat, 4) - 4) / 4.6);
+			--phase-len: calc(var(--part, 1) / 4.6);
+			animation-timeline: --hero-pull-request;
+		}
+		.hero-scene[data-play='scroll'] .graph :is(.enter, .draw, .pulse) {
+			--phase: calc((var(--beat, 2) - 2) / 6.6);
+			--phase-len: calc(var(--part, 1) / 6.6);
+			animation-timeline: --hero-pull-request;
+		}
 		.hero-scene[data-play='scroll'] :is(.enter, .slide, .lit, .lit-text, .type, .draw, .pulse, .interim, .breathe, .tap) {
 			animation-duration: auto;
 			animation-delay: 0s;
-			animation-timeline: --hero;
-			animation-range-start: cover calc(var(--hero-scroll-from) + var(--hero-scroll-beat) * var(--beat, 0));
-			animation-range-end: cover calc(var(--hero-scroll-from) + var(--hero-scroll-beat) * (var(--beat, 0) + var(--part, 1)));
+			animation-range-start: entry calc(var(--hero-entry-from) + var(--hero-entry-span) * var(--phase));
+			animation-range-end: entry calc(var(--hero-entry-from) + var(--hero-entry-span) * (var(--phase) + var(--phase-len)));
 		}
 	}
 	/* A scene hidden after its story started (Scene.astro sets data-ended) shows its final frame

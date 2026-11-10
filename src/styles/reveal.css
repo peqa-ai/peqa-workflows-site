@@ -79,7 +79,7 @@
    and the first piece of its scene come in at its start, so no gap is left over it.
    The text comes in over the first half; the scene tells its story from --story-from to the
    end (scene.css). A row that fits the screen is pinned (reveal.ts sets data-pin and --pin-top):
-   it holds still, centered, for --skill-pin of scroll while the story plays, and the story
+   it holds still, centered, for --pin-hold of scroll while the story plays, and the story
    ends a little before it lets go. */
 .skill {
 	--row-travel: calc(100svh - var(--pin-top, var(--skill-rest)));
@@ -96,9 +96,19 @@
 		--story-from: var(--story-from-beside);
 	}
 }
-/* The last row holds for less: the sections after it come right behind. */
-.skill:last-child {
-	--skill-pin: var(--skill-pin-last);
+/* How long a pinned row holds: not at all with its scene under its text, where the room it
+   holds for would show as an empty band over the next rule; the full hold with the scene beside
+   the text; and less for the last row there, which the sections after it follow at once. */
+.skill {
+	--pin-hold: var(--skill-pin-under);
+}
+@container skills (min-width: 52rem) {
+	.skill {
+		--pin-hold: var(--skill-pin);
+	}
+	.skill:last-child {
+		--pin-hold: var(--skill-pin-last);
+	}
 }
 .skill .rule-top::before {
 	--at: 0;
@@ -239,12 +249,12 @@
 		   room is a box after the content, inside the row: a sticky box only moves within its
 		   container's content. */
 		.skill[data-pin] {
-			--pin-length: var(--skill-pin);
+			--pin-length: var(--pin-hold);
 		}
 		.skill[data-pin]::after {
 			content: '';
 			display: block;
-			height: var(--skill-pin);
+			height: var(--pin-hold);
 		}
 		.skill[data-pin] > .pin {
 			position: sticky;

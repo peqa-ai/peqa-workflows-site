@@ -374,11 +374,12 @@
 		stroke-dashoffset: -1;
 	}
 }
-/* A window coming in from the right. */
+/* A window coming in along the line that reaches it, from its left: it never passes the
+   drawing's right edge, which is the column's. */
 @keyframes scene-slide-in {
 	from {
 		opacity: 0;
-		transform: translateX(calc(var(--scene-rise) * 4));
+		transform: translateX(calc(var(--scene-rise) * -4));
 	}
 }
 /* A part growing out of the line it comes from. */
@@ -443,8 +444,9 @@
 	}
 }
 
-/* The hero scene: the page's one sequence that plays without anyone acting, once, on load or
-   as it comes into view. Screens only, so a page printed before it ends shows the final frame. */
+/* The hero scene: the page's one sequence that plays without anyone acting, once, on load;
+   where it starts below the first screen it follows the scroll instead, or, without scroll
+   timelines, plays once as it comes into view. Screens only, so a page printed before it ends shows the final frame. */
 @media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
 	.hero-scene .enter {
 		animation: scene-enter var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
@@ -483,9 +485,29 @@
 	}
 	/* The script decides when the story plays (Scene.astro sets data-play="run"): until then, and
 	   while a scene below the screen waits for it ("waiting", play-on-view.ts), the scene holds its
-	   first frame. */
-	.hero-scene:not([data-play='run']) * {
+	   first frame. With the scroll ("scroll", below) its position on screen plays it. */
+	.hero-scene:not([data-play='run'], [data-play='scroll']) * {
 		animation-play-state: paused;
+	}
+	/* With the scroll: where the scene starts below the first screen (a phone) and the browser
+	   has scroll timelines, the story follows the scene's way up the screen, forward and back,
+	   in place of the autonomous one. A beat is --hero-scroll-beat of scroll, counted from
+	   --hero-scroll-from of the scene showing; each part lasts what it lasts in time, in beats. */
+	@supports (animation-timeline: --hero) and (view-timeline: --hero block) and (animation-range-start: cover 1px) {
+		.hero-scene[data-play='scroll'] {
+			view-timeline: --hero block;
+		}
+		.hero-scene[data-play='scroll'] :is(.enter, .slide, .lit, .lit-text, .type) { --part: 0.6; }
+		.hero-scene[data-play='scroll'] :is(.draw, .pulse) { --part: 1; }
+		.hero-scene[data-play='scroll'] :is(.interim, .breathe) { --part: var(--span, 1); }
+		.hero-scene[data-play='scroll'] .tap { --part: 1.2; }
+		.hero-scene[data-play='scroll'] :is(.enter, .slide, .lit, .lit-text, .type, .draw, .pulse, .interim, .breathe, .tap) {
+			animation-duration: auto;
+			animation-delay: 0s;
+			animation-timeline: --hero;
+			animation-range-start: cover calc(var(--hero-scroll-from) + var(--hero-scroll-beat) * var(--beat, 0));
+			animation-range-end: cover calc(var(--hero-scroll-from) + var(--hero-scroll-beat) * (var(--beat, 0) + var(--part, 1)));
+		}
 	}
 	/* A scene hidden after its story started (Scene.astro sets data-ended) shows its final frame
 	   when it comes back, instead of playing the story again. */
@@ -541,13 +563,14 @@
 		}
 	}
 
-	/* In time: the scene waits on its first frame, then plays its story once, starting while
-	   the row's text comes in. */
-	.skill:is([data-play='waiting'], [data-play='run']) .skill-figure :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .arc, .shift-in, .pulse, .slide-in, .pop, .seek) {
+	/* In time: the drawing waits on its first frame until its row is framed on screen (reveal.ts
+	   sets data-play on the drawing itself), then plays its story once. The row's text does not
+	   wait for it. */
+	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .arc, .shift-in, .pulse, .slide-in, .pop, .seek) {
 		animation-duration: calc(var(--span, 1) * var(--scene-step));
-		animation-delay: calc(var(--reveal-time) * var(--story-from) + (var(--step, 0) + var(--lag, 0) / 4) * var(--scene-step));
+		animation-delay: calc((var(--step, 0) + var(--lag, 0) / 4) * var(--scene-step));
 	}
-	.skill[data-play='waiting'] .skill-figure * {
+	.skill-figure[data-play='waiting'] * {
 		animation-play-state: paused;
 	}
 }

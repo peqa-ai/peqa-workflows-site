@@ -6,8 +6,9 @@
 // its scene fails the build.
 //
 // Each row is a reveal scope (src/styles/reveal.css): its rule is drawn, its name rises from
-// under its line, its sentence takes opacity, its request is typed word by word, and then its
-// scene tells its story (scene.css), all following the row's way up the screen. The request's
+// under its line, its sentence takes opacity, its request's block too and its words are typed
+// one by one, while its scene tells its story (scene.css), all following the row's way up the
+// screen. No text leaves its own box to come in, so finding it in the page leads to it. The request's
 // words are inline spans, so it reads and copies as one sentence.
 import { skillFigures } from '../data/skill-figures.mjs';
 import { skillCopy } from '../data/skills';
@@ -36,11 +37,11 @@ const rows = release.skills.map((skill) => ({
 			<li class="skill" data-reveal>
 				<div class="pin rule-top">
 					<div class="copy">
-						<h3 class="rv-mask">
+						<h3>
 							<span class="rv rv-rise">{row.name}</span>
 						</h3>
 						<p class="summary rv rv-fade">{row.summary}</p>
-						<p class="ask rv rv-wipe">
+						<p class="ask rv rv-fade">
 							<svg class="prompt" viewBox="0 0 8 12" aria-hidden="true" focusable="false">
 								<path d="M1 1l5 5-5 5" />
 							</svg>
@@ -150,11 +151,13 @@ const rows = release.skills.map((skill) => ({
 		}
 	}
 	/* Token --breakpoint-ask: in a list this narrow, as a phone with text at 200 %, the mark
-	   goes in line with the text and the block's sides tighten, so the request keeps the width. */
+	   goes in line with the text, the block's sides tighten and the request takes the size below,
+	   so its longest word («implementación», 14 characters) fits a line and is not cut. */
 	@container skills (max-width: 16rem) {
 		.ask {
 			display: block;
 			padding-inline: var(--space-2);
+			font-size: var(--text-xs);
 		}
 		.prompt {
 			display: inline;

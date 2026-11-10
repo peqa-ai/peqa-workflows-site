@@ -149,12 +149,38 @@
 	/* On paper a scene sits beside its text at this width, so the landing fits four A4 sheets
 	   or fewer. Source: the printed page, about 45rem wide between its margins. */
 	--skill-scene-width-print: 20rem;
-	/* The stretch of a skill scene's way across the screen in which it tells its story, as
-	   shares of its cover range (from its top at the bottom of the screen to its bottom at the
-	   top): it starts a little after the scene comes in and ends with the scene near the middle
-	   of the screen. Source: the plan, measured at 1440 × 900 and 390 × 844. */
-	--skill-scene-from: 14%;
-	--skill-scene-span: 40%;
+	/* Reveal (reveal.css): how each block of the landing comes in with the scroll. A section's
+	   title, rule and ledger rows come in over this stretch of scroll from its top showing at
+	   the bottom of the screen: short, so it also ends at the foot of the page. In time, where
+	   scroll timelines are missing, the same takes --reveal-section-time. Source: fase 4's plan,
+	   measured at 1440 × 900 and 390 × 844. */
+	--reveal-section: 16rem;
+	--reveal-section-time: 900ms;
+	/* A skill's row holds still, centered on the screen, for this stretch of scroll while its
+	   scene tells its story (position: sticky), when it fits the screen. Source: the plan. */
+	--skill-pin: 55svh;
+	/* Where the top of a row that is not pinned (too tall for the screen) is when its story
+	   ends, from the top of the screen. Source: the plan. */
+	--skill-rest: 30svh;
+	/* In time: how long a row's text takes to come in, and one of the ten steps of its scene's
+	   story. Source: motion-design's Corporate durations. */
+	--skill-enter-time: 1400ms;
+	--scene-step: 380ms;
+	/* The ambient layer: how far below its place a scene starts, so it arrives a little after
+	   its text. Source: motion-design, counter-motion at a fraction of the content's. */
+	--scene-drift: 2rem;
+	/* How far below its line a skill's name starts, hidden under it: past the room the line
+	   leaves for descenders, so no tip of it shows. */
+	--reveal-rise: 160%;
+	/* A pulse's length, as a share of the line it runs. Source: the drawings. */
+	--scene-pulse: 0.14;
+	/* How high an approved note's arc rises, and the steps of the seeking frame over the
+	   catalogue of memoria-extraer, in scene units. Source: the scenes' drawings. */
+	--scene-arc: 28px;
+	--scene-seek-x: 48px;
+	--scene-seek-y: 64px;
+	/* The characters of a typed line of the hero's session. Source: its longest line. */
+	--scene-type-steps: 24;
 	/* How far a note travels, in scene units: the relevant ones out of the catalogue in
 	   memoria-extraer, the approved ones into the pull request in memoria-guardar. Source: the
 	   scenes' drawings. */

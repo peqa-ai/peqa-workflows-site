@@ -1,5 +1,9 @@
 ---
-// A landing section: a rule and a title open it, its content follows (peqa.ai's .section).
+// A landing section: a rule and a title open it, its content follows (peqa.ai's .section). It
+// is a reveal scope (src/styles/reveal.css): where it starts below the screen, its rule is
+// drawn, its title uncovered and the rows of its ledger come in as it scrolls into view.
+import '../styles/reveal.css';
+
 interface Props {
 	id: string;
 	title: string;
@@ -7,17 +11,22 @@ interface Props {
 const { id, title } = Astro.props;
 ---
 
-<section class="landing-section not-content" aria-labelledby={id}>
-	<h2 {id}>{title}</h2>
+<section class="landing-section rule-top not-content" aria-labelledby={id} data-reveal>
+	<h2 class="rv rv-wipe" {id}>{title}</h2>
 	<slot />
 </section>
+
+<script>
+	import { reveal } from '../lib/reveal';
+
+	reveal();
+</script>
 
 <style>
 	.landing-section {
 		display: grid;
 		gap: var(--space-5);
 		padding-block: var(--space-6);
-		border-top: var(--border-width) solid var(--color-border);
 	}
 	/* On paper a title stays on the sheet of what it opens. */
 	@media print {
@@ -25,7 +34,9 @@ const { id, title } = Astro.props;
 			break-after: avoid;
 		}
 	}
+	/* As wide as its text, so the window that uncovers it ends where the title does. */
 	h2 {
+		justify-self: start;
 		max-width: var(--heading-measure);
 		font-family: var(--font-brand);
 		font-weight: var(--weight-title);

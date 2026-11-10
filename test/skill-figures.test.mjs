@@ -8,12 +8,15 @@ import { assertSkillCoverage } from '../src/lib/skill-coverage.mjs';
 const README = readFileSync(new URL('./fixtures/README-v0.17.0.md', import.meta.url), 'utf8');
 const CONTEXT = { repo: 'peqa-ai/peqa-workflows', tag: 'v0.17.0', anchors: new Map(), paths: new Map() };
 const SKILLS = extractSkills(README, CONTEXT).map((skill) => skill.name);
+const SKILLS_EXAMPLES = extractSkills(README, CONTEXT).map((skill) => skill.example);
 const FIGURES = { file: 'src/data/skill-figures.mjs', tag: 'v0.17.0', item: 'escenas para ' };
 
 /** Every part of a figure, groups and their children alike. */
 const partsOf = (parts) => parts.flatMap((part) => [part, ...partsOf(part[3] ?? [])]);
-const MOTION = ['draw', 'enter', 'ink', 'fill', 'outline', 'accent-fill', 'scan', 'carry', 'shift-in'];
-const STEPS = ['s1', 's2', 's3', 's4', 's5', 's6'];
+const MOTION = ['draw', 'enter', 'ink', 'fill', 'outline', 'accent-fill', 'scan', 'arc', 'shift-in', 'pulse', 'slide-in', 'pop', 'seek'];
+const STEPS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
+// Seen only while a story plays: they are not part of the final frame.
+const TRANSIENT = ['scan', 'pulse', 'seek'];
 
 describe('assertSkillCoverage', () => {
 	test('every skill of the v0.17.0 README table has a figure', () => {
@@ -106,16 +109,32 @@ describe('skill scenes', () => {
 		}
 	});
 
-	test('every story uses its six steps, so the scenes take the same stretch of scroll', () => {
+	test('every story runs from its first step to its tenth, with no step left empty for long', () => {
 		for (const [name, { parts }] of Object.entries(skillFigures)) {
-			const used = new Set(partsOf(parts).flatMap(([, className]) => className.split(' ').filter((item) => STEPS.includes(item))));
-			assert.deepEqual([...used].sort(), STEPS, name);
+			const used = new Set();
+			for (const [, className] of partsOf(parts)) {
+				const classes = className.split(' ');
+				const step = STEPS.findIndex((item) => classes.includes(item));
+				if (step < 0) continue;
+				const span = classes.includes('span3') ? 3 : classes.includes('long') ? 2 : 1;
+				for (let i = step; i < step + span; i++) used.add(STEPS[i]);
+			}
+			assert.deepEqual([...used].sort((x, y) => STEPS.indexOf(x) - STEPS.indexOf(y)), STEPS, name);
+		}
+	});
+
+	test('every scene shows cause and effect: a pulse, a scan, a seeking frame or a travelling object', () => {
+		for (const [name, { parts }] of Object.entries(skillFigures)) {
+			const classes = partsOf(parts).flatMap(([, className]) => className.split(' '));
+			assert.ok(['pulse', 'scan', 'seek', 'arc'].some((item) => classes.includes(item)), name);
 		}
 	});
 
 	test('every final frame stays inside the margins and ends at the right one', () => {
 		for (const [name, { parts }] of Object.entries(skillFigures)) {
-			const points = partsOf(parts).flatMap(pointsOf);
+			const points = partsOf(parts)
+				.filter(([, className]) => !className.split(' ').some((item) => TRANSIENT.includes(item)))
+				.flatMap(pointsOf);
 			const xs = points.map(([x]) => x);
 			const ys = points.map(([, y]) => y);
 			assert.equal(Math.min(...xs), FIGURE_MARGIN, `${name} starts at the left margin`);
@@ -157,5 +176,18 @@ describe('skill scenes', () => {
 				for (const child of children) assert.equal(child[3], undefined, `${name}: nested group`);
 			}
 		}
+	});
+});
+
+describe('words', () => {
+	test('splits a request at its spaces and gives it back when joined', async () => {
+		const { words } = await import('../src/lib/words.mjs');
+		for (const request of SKILLS_EXAMPLES) assert.equal(words(request).join(' '), request);
+		assert.deepEqual(words('  Guarda   cómo desplegamos\teste servicio '), ['Guarda', 'cómo', 'desplegamos', 'este', 'servicio']);
+	});
+
+	test('no request of the release has more words than reveal.css types one by one', async () => {
+		const { words } = await import('../src/lib/words.mjs');
+		for (const request of SKILLS_EXAMPLES) assert.ok(words(request).length <= 11, request);
 	});
 });

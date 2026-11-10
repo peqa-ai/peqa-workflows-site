@@ -112,9 +112,29 @@
 	fill: var(--color-on-accent);
 }
 /* Seen only while a story plays: a working mark, a state about to change, the buttons of a
-   decision, a scan, a tap. */
-.scene-art :is(.interim, .scan, .tap) {
+   decision, a scan, a tap, a pulse travelling a line, a frame seeking through a list. */
+.scene-art :is(.interim, .scan, .tap, .pulse, .seek) {
 	opacity: 0;
+}
+/* A pulse: a short stroke in ink that runs a line of the graph from its start to its end (the
+   element has pathLength="1"), so what the line reaches appears because something got there. */
+.scene-art .pulse {
+	fill: none;
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke-strong);
+	stroke-dasharray: var(--scene-pulse) 2;
+	stroke-dashoffset: var(--scene-pulse);
+}
+/* A frame in ink that goes over a list, item by item. */
+.scene-art .seek {
+	fill: none;
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke-strong);
+}
+/* Parts that grow from where they come out. */
+.scene-art .pop {
+	transform-box: fill-box;
+	transform-origin: left center;
 }
 .scene-art .scan {
 	stroke: var(--color-accent);
@@ -187,7 +207,7 @@
 }
 
 /* Story steps. The hero names the beat at which an element plays (b1 is the second beat);
-   a skill scene names its step (s1 to s6) and, inside a step, its place in a stagger. */
+   a skill scene names its step (s1 to s10) and, inside a step, its place in a stagger. */
 .scene-art .b1 { --beat: 1; }
 .scene-art .b2 { --beat: 2; }
 .scene-art .b3 { --beat: 3; }
@@ -203,10 +223,17 @@
 .scene-art .s4 { --step: 3; }
 .scene-art .s5 { --step: 4; }
 .scene-art .s6 { --step: 5; }
+.scene-art .s7 { --step: 6; }
+.scene-art .s8 { --step: 7; }
+.scene-art .s9 { --step: 8; }
+.scene-art .s10 { --step: 9; }
 .scene-art .long { --span: 2; }
 .scene-art .lag0 { --lag: 0; --span: 0.5; }
 .scene-art .lag1 { --lag: 1; --span: 0.5; }
 .scene-art .lag2 { --lag: 2; --span: 0.5; }
+.scene-art .lag3 { --lag: 3; --span: 0.5; }
+.scene-art .span3 { --span: 3; }
+.scene-art .half { --beat: 0.5; }
 
 @keyframes scene-enter {
 	from {
@@ -317,10 +344,95 @@
 		stroke: var(--color-text);
 	}
 }
-/* An approved note travelling to the right, from the place it leaves. */
-@keyframes scene-carry {
+/* An approved note travelling to the right in an arc, from the place it leaves. */
+@keyframes scene-arc {
 	from {
-		transform: translateX(calc(var(--scene-carry) * -1));
+		transform: translate(calc(var(--scene-carry) * -1), 0);
+	}
+	25% {
+		transform: translate(calc(var(--scene-carry) * -0.75), calc(var(--scene-arc) * -0.75));
+	}
+	50% {
+		transform: translate(calc(var(--scene-carry) * -0.5), calc(var(--scene-arc) * -1));
+	}
+	75% {
+		transform: translate(calc(var(--scene-carry) * -0.25), calc(var(--scene-arc) * -0.75));
+	}
+}
+/* A pulse running its line, seen only while it travels. */
+@keyframes scene-pulse {
+	0% {
+		opacity: 0;
+		stroke-dashoffset: var(--scene-pulse);
+	}
+	10%,
+	90% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		stroke-dashoffset: -1;
+	}
+}
+/* A window coming in from the right. */
+@keyframes scene-slide-in {
+	from {
+		opacity: 0;
+		transform: translateX(calc(var(--scene-rise) * 4));
+	}
+}
+/* A part growing out of the line it comes from. */
+@keyframes scene-pop {
+	from {
+		opacity: 0;
+		transform: scale(0.6);
+	}
+}
+/* A frame going over a list of two columns and three rows, item by item: it holds on each and
+   jumps to the next. */
+@keyframes scene-seek {
+	0% {
+		opacity: 0;
+		transform: none;
+	}
+	4%,
+	14% {
+		opacity: 1;
+		transform: none;
+	}
+	18%,
+	30% {
+		transform: translate(var(--scene-seek-x), 0);
+	}
+	34%,
+	46% {
+		transform: translate(0, var(--scene-seek-y));
+	}
+	50%,
+	62% {
+		transform: translate(var(--scene-seek-x), var(--scene-seek-y));
+	}
+	66%,
+	78% {
+		transform: translate(0, calc(var(--scene-seek-y) * 2));
+	}
+	82%,
+	96% {
+		opacity: 1;
+		transform: translate(var(--scene-seek-x), calc(var(--scene-seek-y) * 2));
+	}
+	100% {
+		opacity: 0;
+		transform: translate(var(--scene-seek-x), calc(var(--scene-seek-y) * 2));
+	}
+}
+/* A line of the session typed character by character. */
+@keyframes scene-type {
+	from {
+		clip-path: inset(0 100% 0 0);
+	}
+	to {
+		clip-path: inset(0 0 0 0);
 	}
 }
 /* A copy of a note coming out to the right. */
@@ -341,6 +453,14 @@
 	.hero-scene .draw {
 		stroke-dasharray: 1 2;
 		animation: scene-draw var(--scene-beat) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	/* A pulse runs each lane of the graph once it is drawn. */
+	.hero-scene .pulse {
+		animation: scene-pulse var(--scene-beat) linear calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	/* The command and the request are typed, a character at a time. */
+	.hero-scene .type {
+		animation: scene-type var(--scene-standard) steps(var(--scene-type-steps), end) calc(var(--beat, 0) * var(--scene-beat)) both;
 	}
 	.hero-scene .slide {
 		animation: scene-slide var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
@@ -374,53 +494,58 @@
 	}
 }
 
-/* Skill scenes. The script (SkillFigure.astro) leaves a scene that is already on screen at
-   load in its final frame; one below the screen gets data-play: "scroll" to follow the scroll
-   (data-motion="scroll"), or "waiting" and then "run" to play once in time where scroll
-   timelines are missing (data-motion="time"). */
+/* Skill scenes. Each plays inside its row, a reveal scope (reveal.css, src/lib/reveal.ts): the
+   row's text comes in over the first share of the row's stretch (--in-share) and the scene
+   tells its story, in ten steps, over the rest. A row that was on screen at load has no
+   data-play and keeps its final frame. With the scroll (data-play="scroll") the story follows
+   the row's own view timeline, forward and back; in time ("waiting", then "run") it plays once
+   after the row's text has come in. */
 @media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
-	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .carry, .shift-in) {
+	.skill[data-play] .skill-figure :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .arc, .shift-in, .pulse, .slide-in, .pop, .seek) {
 		animation-fill-mode: both;
+		animation-timing-function: var(--scene-ease);
 	}
 	/* A dash as long as the stroke and a longer gap, so the hidden stroke leaves no sliver. */
-	.skill-figure[data-play] .draw {
+	.skill[data-play] .skill-figure .draw {
 		stroke-dasharray: 1 2;
 		animation-name: scene-draw;
 	}
-	.skill-figure[data-play] .enter { animation-name: scene-enter; }
-	.skill-figure[data-play] .ink { animation-name: scene-ink; }
-	.skill-figure[data-play] .fill { animation-name: scene-fill; }
-	.skill-figure[data-play] .outline { animation-name: scene-outline; }
-	.skill-figure[data-play] .accent-fill { animation-name: scene-accent; }
-	.skill-figure[data-play] .scan { animation-name: scene-scan; }
-	.skill-figure[data-play] .carry { animation-name: scene-carry; }
-	.skill-figure[data-play] .shift-in { animation-name: scene-shift-in; }
-
-	/* With the scroll: the scene's own view timeline drives its parts, forward and back. A
-	   step is a sixth of the story's stretch of the scene's cover range. */
-	@supports (animation-timeline: view()) {
-		.skill-figure[data-play='scroll'] {
-			view-timeline: --skill-figure block;
-		}
-		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .carry, .shift-in) {
-			animation-duration: auto;
-			animation-timing-function: linear;
-			animation-timeline: --skill-figure;
-			animation-range-start: cover calc(var(--skill-scene-from) + var(--skill-scene-span) * (var(--step, 0) + var(--lag, 0) / 4) / 6);
-			animation-range-end: cover calc(var(--skill-scene-from) + var(--skill-scene-span) * (var(--step, 0) + var(--lag, 0) / 4 + var(--span, 1)) / 6);
-		}
-	}
-
-	/* In time: the scene waits on its first frame, then plays its story once. */
-	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .carry, .shift-in) {
-		animation-duration: calc(var(--span, 1) * var(--scene-beat));
-		animation-timing-function: var(--scene-ease);
-		animation-delay: calc((var(--step, 0) + var(--lag, 0) / 4) * var(--scene-beat));
-	}
-	.skill-figure:is([data-play='waiting'], [data-play='run']) .scan {
+	.skill[data-play] .skill-figure .enter { animation-name: scene-enter; }
+	.skill[data-play] .skill-figure .ink { animation-name: scene-ink; }
+	.skill[data-play] .skill-figure .fill { animation-name: scene-fill; }
+	.skill[data-play] .skill-figure .outline { animation-name: scene-outline; }
+	.skill[data-play] .skill-figure .accent-fill { animation-name: scene-accent; }
+	.skill[data-play] .skill-figure .scan { animation-name: scene-scan; }
+	.skill[data-play] .skill-figure .arc { animation-name: scene-arc; }
+	.skill[data-play] .skill-figure .shift-in { animation-name: scene-shift-in; }
+	.skill[data-play] .skill-figure .pulse { animation-name: scene-pulse; }
+	.skill[data-play] .skill-figure .slide-in { animation-name: scene-slide-in; }
+	.skill[data-play] .skill-figure .pop { animation-name: scene-pop; }
+	.skill[data-play] .skill-figure .seek { animation-name: scene-seek; }
+	/* What travels at a constant speed. */
+	.skill[data-play] .skill-figure :is(.scan, .pulse, .seek, .arc) {
 		animation-timing-function: linear;
 	}
-	.skill-figure[data-play='waiting'] * {
+
+	/* With the scroll: a step is a tenth of the story's share of the row's stretch. */
+	@supports (animation-timeline: view()) {
+		.skill[data-play='scroll'] .skill-figure :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .arc, .shift-in, .pulse, .slide-in, .pop, .seek) {
+			--story-at: calc(var(--in-share) + (1 - var(--in-share)) * (var(--step, 0) + var(--lag, 0) / 4) / 10);
+			--story-len: calc((1 - var(--in-share)) * var(--span, 1) / 10);
+			animation-duration: auto;
+			animation-timeline: --reveal;
+			animation-range-start: cover calc(var(--reveal-from) + (var(--reveal-to) - var(--reveal-from)) * var(--story-at));
+			animation-range-end: cover calc(var(--reveal-from) + (var(--reveal-to) - var(--reveal-from)) * (var(--story-at) + var(--story-len)));
+		}
+	}
+
+	/* In time: the scene waits on its first frame, then plays its story once, after the row's
+	   text has come in. */
+	.skill:is([data-play='waiting'], [data-play='run']) .skill-figure :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .arc, .shift-in, .pulse, .slide-in, .pop, .seek) {
+		animation-duration: calc(var(--span, 1) * var(--scene-step));
+		animation-delay: calc(var(--reveal-time) + (var(--step, 0) + var(--lag, 0) / 4) * var(--scene-step));
+	}
+	.skill[data-play='waiting'] .skill-figure * {
 		animation-play-state: paused;
 	}
 }

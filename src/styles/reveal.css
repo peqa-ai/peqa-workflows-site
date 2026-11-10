@@ -1,0 +1,247 @@
+/*
+ * How the landing's blocks come in with the scroll. A reveal scope (data-reveal: a landing
+ * section or a skill's row) owns a stretch of scroll, from --reveal-from to --reveal-to after
+ * its top shows at the bottom of the screen, and each part inside it (.rv) takes its place in
+ * the first share of that stretch (--in-share) with --at and --len, from 0 to 1. Every kind of
+ * part comes in its own way: a rule is drawn from the left, a title is uncovered as if
+ * written, a skill's name rises from under its line, a sentence takes opacity, a request is
+ * typed word by word. No literal values here.
+ *
+ * The markup is the final state. src/lib/reveal.ts turns on only the scopes still below the
+ * screen at load: data-play="scroll" where CSS has scroll timelines, so the parts follow the
+ * scroll forward and back; "waiting" and then "run" otherwise, so they play once in time as
+ * the scope comes into view. Without JavaScript, with reduced motion and in print no scope is
+ * on, and everything shows.
+ */
+
+/* A rule that can be drawn: the element keeps its border's place and a line lies over it. */
+.rule-top {
+	position: relative;
+	border-top: var(--border-width) solid transparent;
+}
+.rule-top::before {
+	content: '';
+	position: absolute;
+	inset: calc(var(--border-width) * -1) 0 auto 0;
+	height: var(--border-width);
+	background: var(--color-border);
+	transform-origin: left center;
+}
+/* Where backgrounds are not painted (paper, forced colors) the border itself is the rule. */
+@media print, (forced-colors: active) {
+	.rule-top {
+		border-top-color: var(--color-border);
+	}
+	.rule-top::before {
+		display: none;
+	}
+}
+
+/* A section's parts: its rule, its title, then each row of its ledger a little after the one
+   before: rule, key, value. */
+.landing-section {
+	--reveal-from: 0px;
+	--reveal-to: var(--reveal-section);
+	--reveal-time: var(--reveal-section-time);
+	--in-share: 1;
+}
+.landing-section.rule-top::before {
+	--at: 0;
+	--len: 0.35;
+}
+.landing-section > h2 {
+	--at: 0.08;
+	--len: 0.4;
+}
+.ledger .row {
+	--row-at: calc(0.2 + var(--row, 0) * 0.13);
+}
+.ledger .row:nth-child(2) { --row: 1; }
+.ledger .row:nth-child(3) { --row: 2; }
+.ledger .row:nth-child(4) { --row: 3; }
+.ledger .row:nth-child(5) { --row: 4; }
+.ledger .row:nth-child(6) { --row: 5; }
+.ledger .row.rule-top::before {
+	--at: var(--row-at);
+	--len: 0.3;
+}
+.ledger .row > dt {
+	--at: calc(var(--row-at) + 0.05);
+	--len: 0.25;
+}
+.ledger .row > dd {
+	--at: calc(var(--row-at) + 0.12);
+	--len: 0.3;
+}
+
+/* A skill's row: its stretch runs from a little after its top shows to the end of its story.
+   The text comes in over the first half and the scene tells its story over the second
+   (scene.css). A row that fits the screen is pinned (reveal.ts sets data-pin and --pin-top):
+   it holds still, centered, for --skill-pin of scroll while the story plays, and the story
+   ends a little before it lets go. */
+.skill {
+	--row-travel: calc(100svh - var(--pin-top, var(--skill-rest)));
+	--reveal-from: calc(var(--row-travel) * 0.15);
+	--reveal-to: calc(var(--row-travel) + var(--pin-length, 0px) * 0.85);
+	--reveal-time: var(--skill-enter-time);
+	--in-share: 0.5;
+}
+.skill .rule-top::before {
+	--at: 0;
+	--len: 0.3;
+}
+.skill h3 > .rv {
+	--at: 0.15;
+	--len: 0.35;
+}
+.skill .summary {
+	--at: 0.35;
+	--len: 0.35;
+}
+.skill .ask {
+	--at: 0.55;
+	--len: 0.2;
+}
+/* The words of the request, typed one after another. */
+.skill .word {
+	--at: calc(0.66 + var(--word, 11) * 0.028);
+	--len: 0.02;
+}
+.skill .word:nth-child(1) { --word: 0; }
+.skill .word:nth-child(2) { --word: 1; }
+.skill .word:nth-child(3) { --word: 2; }
+.skill .word:nth-child(4) { --word: 3; }
+.skill .word:nth-child(5) { --word: 4; }
+.skill .word:nth-child(6) { --word: 5; }
+.skill .word:nth-child(7) { --word: 6; }
+.skill .word:nth-child(8) { --word: 7; }
+.skill .word:nth-child(9) { --word: 8; }
+.skill .word:nth-child(10) { --word: 9; }
+.skill .word:nth-child(11) { --word: 10; }
+/* The ambient layer: the scene drifts up into its place over the whole entrance. What its
+   drawing shows from its first frame (the budget's empty marks, a list) comes in last, right
+   before the story starts. */
+.skill .scene {
+	--at: 0;
+	--len: 1;
+}
+.skill .skill-figure {
+	--at: 0.88;
+	--len: 0.12;
+}
+
+@keyframes reveal-rule {
+	from {
+		transform: scaleX(0);
+	}
+}
+/* Uncovered from the left. The window bleeds past the box on the other sides, so strokes that
+   overhang it are not cut. */
+@keyframes reveal-wipe {
+	from {
+		clip-path: inset(calc(var(--space-2) * -1) 100% calc(var(--space-2) * -1) calc(var(--space-2) * -1));
+	}
+	to {
+		clip-path: inset(calc(var(--space-2) * -1));
+	}
+}
+@keyframes reveal-rise {
+	from {
+		transform: translateY(var(--reveal-rise));
+	}
+}
+@keyframes reveal-fade {
+	from {
+		opacity: 0;
+	}
+}
+@keyframes reveal-drift {
+	from {
+		transform: translateY(var(--scene-drift));
+	}
+}
+
+@media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+	[data-play] .rv,
+	[data-play] .rule-top::before,
+	[data-play].rule-top::before {
+		animation-fill-mode: both;
+		animation-timing-function: var(--scene-ease);
+	}
+	[data-play] .rule-top::before,
+	[data-play].rule-top::before {
+		animation-name: reveal-rule;
+		animation-timing-function: linear;
+	}
+	[data-play] .rv-wipe { animation-name: reveal-wipe; }
+	[data-play] .rv-rise { animation-name: reveal-rise; }
+	[data-play] .rv-fade { animation-name: reveal-fade; }
+	[data-play] .rv-drift { animation-name: reveal-drift; }
+	/* A typed word shows at once, at the end of its turn. */
+	[data-play] .rv-type {
+		animation-name: reveal-fade;
+		animation-timing-function: step-end;
+	}
+	/* The line a name rises from under: it hides what is below it, with room for descenders. */
+	[data-play] .rv-mask {
+		overflow: clip;
+		padding-block-end: var(--space-2);
+		margin-block-end: calc(var(--space-2) * -1);
+	}
+	.rv-rise {
+		display: inline-block;
+		max-width: 100%;
+	}
+
+	/* With the scroll: each part follows its scope's view timeline, forward and back. */
+	@supports (animation-timeline: view()) {
+		[data-play='scroll'] {
+			view-timeline: --reveal block;
+		}
+		[data-play='scroll'] .rv,
+		[data-play='scroll'] .rule-top::before,
+		[data-play='scroll'].rule-top::before {
+			--part-at: calc(var(--in-share) * var(--at, 0));
+			--part-len: calc(var(--in-share) * var(--len, 1));
+			animation-duration: auto;
+			animation-timeline: --reveal;
+			animation-range-start: cover calc(var(--reveal-from) + (var(--reveal-to) - var(--reveal-from)) * var(--part-at));
+			animation-range-end: cover calc(var(--reveal-from) + (var(--reveal-to) - var(--reveal-from)) * (var(--part-at) + var(--part-len)));
+		}
+		/* A pinned row: taller by the stretch it holds for, its content stuck at --pin-top. The
+		   room is a box after the content, inside the row: a sticky box only moves within its
+		   container's content. */
+		.skill[data-pin] {
+			--pin-length: var(--skill-pin);
+		}
+		.skill[data-pin]::after {
+			content: '';
+			display: block;
+			height: var(--skill-pin);
+		}
+		.skill[data-pin] > .pin {
+			position: sticky;
+			top: var(--pin-top);
+		}
+	}
+
+	/* In time: each part waits on its first frame, then plays once. */
+	:is([data-play='waiting'], [data-play='run']) .rv,
+	:is([data-play='waiting'], [data-play='run']) .rule-top::before,
+	:is([data-play='waiting'], [data-play='run']).rule-top::before {
+		animation-duration: calc(var(--len, 1) * var(--reveal-time));
+		animation-delay: calc(var(--at, 0) * var(--reveal-time));
+	}
+	[data-play='waiting'] .rv,
+	[data-play='waiting'] .rule-top::before,
+	[data-play='waiting'].rule-top::before {
+		animation-play-state: paused;
+	}
+
+	/* Keyboard focus inside a scope shows it whole, wherever its story is. */
+	[data-play]:focus-within .rv,
+	[data-play]:focus-within .rule-top::before,
+	[data-play]:focus-within.rule-top::before {
+		animation-name: none;
+	}
+}

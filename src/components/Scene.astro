@@ -5,7 +5,8 @@
 // theme's commit graph: a lane out of each subagent, merged into the pull request. Otherwise
 // they stack, as peqa.ai's pieces wrap, without the graph. It tells one story in beats of
 // --scene-beat (scene.css), once: b1 plays at the second beat, and it ends with the pull
-// request merged. It starts on load or, if it is still below the screen
+// request merged. The session types its command and the request, and a pulse runs each lane
+// of the graph down to the pull request. It starts on load or, if it is still below the screen
 // then, once the pull request, where it ends, is all in view. The markup is the final frame.
 // Assistive technology reads the scene as one image described by its story.
 import { sceneCopy } from '../data/scene';
@@ -25,10 +26,9 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 		<line class="rule" x1="2" y1="32" x2="258" y2="32" />
 		<rect class="panel" x="14" y="42" width="232" height="42" />
 		<path class="icon" d="M21 49l4 4-4 4" />
-		<g class="enter">
-			<text class="small" x="32" y="57">{t.command}</text>
-			<text class="small" x="32" y="74" data-example>{t.request}</text>
-		</g>
+		{/* The command and the request are typed, one line after the other. */}
+		<text class="small type" x="32" y="57">{t.command}</text>
+		<text class="small type half" x="32" y="74" data-example>{t.request}</text>
 		<g class="enter b1">
 			<text class="label" x="14" y="106">{t.subagents}</text>
 			{
@@ -58,6 +58,10 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 		<path class="flow draw b2" pathLength="1" d="M258 122H316C332 122 340 130 340 146V228" />
 		<path class="flow draw b3" pathLength="1" d="M258 142H316C330 142 340 150 340 164" />
 		<path class="flow draw b3" pathLength="1" d="M258 162H316C330 162 340 170 340 184" />
+		{/* A pulse runs each lane once it is drawn, down the trunk to the pull request. */}
+		<path class="pulse b3" pathLength="1" d="M258 122H316C332 122 340 130 340 146V228" />
+		<path class="pulse b4" pathLength="1" d="M258 142H316C330 142 340 150 340 164V228" />
+		<path class="pulse b4" pathLength="1" d="M258 162H316C330 162 340 170 340 184V228" />
 		<rect class="ink enter b2" x="282" y="118" width="8" height="8" />
 		<rect class="ink enter b3" x="282" y="138" width="8" height="8" />
 		<rect class="ink enter b3" x="282" y="158" width="8" height="8" />

@@ -1,9 +1,11 @@
 ---
 // The landing's hero scene, translated from peqa.ai's Scene.js (scene `peqa-workflows`): two
-// pieces, the agent session and the pull request, each its own SVG with its own viewBox, side
-// by side where the column fits both and stacked otherwise, as peqa.ai's pieces wrap. It tells
-// one story in beats of --scene-beat (scene.css), once: b1 plays at the second beat, and it
-// ends with the pull request merged. It starts on load or, if it is still below the screen
+// pieces, the agent session and the pull request, each its own SVG with its own viewBox. Where
+// the column fits them they step down in a diagonal, and a third SVG joins them with the
+// theme's commit graph: a lane out of each subagent, merged into the pull request. Otherwise
+// they stack, as peqa.ai's pieces wrap, without the graph. It tells one story in beats of
+// --scene-beat (scene.css), once: b1 plays at the second beat, and it ends with the pull
+// request merged. It starts on load or, if it is still below the screen
 // then, once the pull request, where it ends, is all in view. The markup is the final frame.
 // Assistive technology reads the scene as one image described by its story.
 import { sceneCopy } from '../data/scene';
@@ -14,9 +16,10 @@ const t = sceneCopy[Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es'];
 const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, done: index > 0 ? 'b3' : 'b2' }));
 ---
 
+<div class="scene-frame">
 <figure class="hero-scene" role="img" aria-label={t.label}>
 	{/* The agent session: the request, then three subagents working in parallel. */}
-	<svg class="scene-art" viewBox="0 0 260 188" aria-hidden="true" focusable="false">
+	<svg class="scene-art piece session" viewBox="0 0 260 188" aria-hidden="true" focusable="false">
 		<rect class="screen" x="2" y="2" width="256" height="184" />
 		<text class="label" x="14" y="22">{t.session}</text>
 		<line class="rule" x1="2" y1="32" x2="258" y2="32" />
@@ -48,11 +51,23 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 			))
 		}
 	</svg>
+	{/* The graph between the pieces, in the units of the stepped composition (400 × 428): each
+	    subagent's lane leaves the session as it finishes, lands its work in a node, and the three
+	    merge into the trunk that opens the pull request. */}
+	<svg class="scene-art graph" viewBox="0 0 400 428" aria-hidden="true" focusable="false">
+		<path class="flow draw b2" pathLength="1" d="M258 122H316C332 122 340 130 340 146V228" />
+		<path class="flow draw b3" pathLength="1" d="M258 142H316C330 142 340 150 340 164" />
+		<path class="flow draw b3" pathLength="1" d="M258 162H316C330 162 340 170 340 184" />
+		<rect class="ink enter b2" x="282" y="118" width="8" height="8" />
+		<rect class="ink enter b3" x="282" y="138" width="8" height="8" />
+		<rect class="ink enter b3" x="282" y="158" width="8" height="8" />
+		<rect class="ink enter b4" x="336" y="206" width="8" height="8" />
+	</svg>
 	{/* The pull request: it opens, revisa reviews it, the person decides the merge, the scene's
 	    one lit step, and it ends merged. The last line is the PR's state: «Abierto», then the
 	    question with its two buttons, then «Mezclado», a resulting status in ink. The buttons
 	    only show while the decision is taken, so the final frame shows no pending button. */}
-	<svg class="scene-art" viewBox="0 0 260 202" aria-hidden="true" focusable="false">
+	<svg class="scene-art piece pull-request" viewBox="0 0 260 202" aria-hidden="true" focusable="false">
 		<rect class="screen" x="2" y="2" width="256" height="198" />
 		<text class="label" x="14" y="22">{t.pullRequest}</text>
 		<line class="rule" x1="2" y1="32" x2="258" y2="32" />
@@ -83,6 +98,7 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 		</g>
 	</svg>
 </figure>
+</div>
 
 <script>
 	import { belowScreen, playOnView, reducedMotion, withoutBox } from '../lib/play-on-view';
@@ -98,6 +114,11 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 </script>
 
 <style>
+	/* The column's width, in the scene's own em, decides the composition. */
+	.scene-frame {
+		container: scene / inline-size;
+		font-size: var(--text-sm);
+	}
 	/* The pieces wrap: side by side where the column fits both at their natural size, stacked
 	   otherwise. The hero may align them with --hero-scene-justify. */
 	.hero-scene {
@@ -113,9 +134,50 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 	/* Each piece at its natural size, 260 units (its viewBox's width) at --scene-unit-hero, and
 	   never wider than the column. In em, so the scene grows with the reader's text; the hero
 	   hides it below --breakpoint-scene. */
-	svg {
+	.hero-scene .piece {
 		width: calc(260 * var(--scene-unit-hero));
 		max-width: 100%;
 		height: auto;
+	}
+	.hero-scene .graph {
+		display: none;
+	}
+	.hero-scene .graph .flow {
+		fill: none;
+		stroke: var(--scene-icon);
+		stroke-width: var(--scene-stroke);
+	}
+	/* Token --breakpoint-scene-wide: the stepped composition, 400 × 428 units. The session sits
+	   at its top left, the pull request at its bottom right, and the graph covers it all; every
+	   size is a share of the composition's, so a column a little narrower shrinks the three
+	   alike. The hero may push it to the column's end with --hero-scene-push. */
+	@container scene (min-width: 27.5em) {
+		.hero-scene {
+			display: block;
+			position: relative;
+			width: calc(400 * var(--scene-unit-hero));
+			max-width: 100%;
+			aspect-ratio: var(--scene-wide-ratio);
+			margin-inline-start: var(--hero-scene-push, 0);
+		}
+		.hero-scene .piece,
+		.hero-scene .graph {
+			position: absolute;
+		}
+		.hero-scene .piece {
+			width: var(--scene-wide-piece);
+		}
+		.hero-scene .session {
+			inset: 0 auto auto 0;
+		}
+		.hero-scene .pull-request {
+			inset: auto 0 0 auto;
+		}
+		.hero-scene .graph {
+			display: block;
+			inset: 0;
+			width: 100%;
+			height: 100%;
+		}
 	}
 </style>

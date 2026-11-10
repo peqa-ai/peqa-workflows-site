@@ -1,34 +1,15 @@
 ---
-// One ledger row: `term` in the mono key column, the slot as its value. With a `figure` slot
-// (the skills) the row also shows a figure, right after the text's measure: in a third column
-// on a wide ledger, beside the key on a narrow one. Rows without it are unchanged.
+// One ledger row: `term` in the mono key column, the slot as its value.
 interface Props {
 	term: string;
 }
 const { term } = Astro.props;
-const figure = Astro.slots.has('figure');
 ---
 
-{
-	figure ? (
-		<div class="row with-figure">
-			<dt>{term}</dt>
-			<dd>
-				<div class="value">
-					<slot />
-				</div>
-				<div class="figure">
-					<slot name="figure" />
-				</div>
-			</dd>
-		</div>
-	) : (
-		<div class="row">
-			<dt>{term}</dt>
-			<dd><slot /></dd>
-		</div>
-	)
-}
+<div class="row">
+	<dt>{term}</dt>
+	<dd><slot /></dd>
+</div>
 
 <style>
 	.row {
@@ -81,93 +62,6 @@ const figure = Astro.slots.has('figure');
 	@container (max-width: 24rem) {
 		.row {
 			grid-template-columns: minmax(0, 1fr);
-		}
-	}
-
-	/* Rows with a figure. Without subgrid the figure simply follows the text. The text keeps
-	   its own spacing however tall the figure beside it is. */
-	.value {
-		display: grid;
-		align-content: start;
-		gap: var(--space-2);
-		max-width: var(--measure);
-		min-width: 0;
-	}
-	.figure {
-		display: flex;
-		justify-content: flex-end;
-		--figure-width: var(--skill-figure-width-compact);
-	}
-	@supports (grid-template-columns: subgrid) {
-		/* A narrow ledger: the key and the figure share the first line, the text goes below.
-		   Both columns together stay within the text's measure, so the figure ends where the
-		   text may. The value spans both lines as a subgrid, so it lets clicks through to the key. */
-		.row.with-figure {
-			grid-template-columns: minmax(0, calc(var(--measure) - var(--skill-figure-width-compact) - var(--space-4))) auto;
-			justify-content: start;
-			align-items: center;
-		}
-		.with-figure > dt {
-			grid-area: 1 / 1;
-		}
-		.with-figure > dd {
-			grid-area: 1 / 1 / 3 / 3;
-			grid-template-columns: subgrid;
-			grid-template-rows: subgrid;
-			gap: normal;
-			max-width: none;
-			pointer-events: none;
-		}
-		.with-figure .value {
-			grid-area: 2 / 1 / 3 / 3;
-			pointer-events: auto;
-		}
-		/* The box of the widest drawing, each drawing against its right edge: the figures end
-		   at the row's right edge. */
-		.with-figure .figure {
-			grid-area: 1 / 2;
-			width: var(--skill-figure-width-compact);
-		}
-		/* Token --ledger-figure-width: a wide ledger puts the figure in a third column, right
-		   after the text's measure; the rest of the row stays free. */
-		@container (min-width: 48rem) {
-			.row.with-figure {
-				grid-template-columns: var(--ledger-key-width) minmax(0, var(--measure)) auto;
-				align-items: baseline;
-			}
-			.with-figure > dd {
-				grid-area: 1 / 2 / 2 / 4;
-				pointer-events: auto;
-			}
-			.with-figure .value {
-				grid-area: 1 / 1;
-			}
-			/* Each drawing against the column's left edge, beside the text. */
-			.with-figure .figure {
-				grid-area: 1 / 2;
-				align-self: start;
-				width: auto;
-				justify-content: flex-start;
-				--figure-width: var(--skill-figure-width);
-			}
-		}
-		/* Token --ledger-figure-stack-width: when the figure no longer fits beside the longest
-		   key, it takes its own line under it. */
-		@container (max-width: 17rem) {
-			.row.with-figure {
-				grid-template-columns: minmax(0, 1fr);
-			}
-			.with-figure > dd {
-				grid-area: 1 / 1 / 4 / 2;
-			}
-			.with-figure .figure {
-				grid-area: 2 / 1;
-				width: auto;
-				justify-content: flex-start;
-			}
-			.with-figure .value {
-				grid-area: 3 / 1;
-			}
 		}
 	}
 </style>

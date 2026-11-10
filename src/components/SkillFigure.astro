@@ -1,10 +1,10 @@
 ---
-// One skill's figure in «Qué le puedes pedir» (src/data/skill-figures.mjs): a short story
-// without text. Its steps follow the scroll, forward and back, where the browser has scroll
-// timelines, and play once in time as the figure comes into view otherwise (scene.css). The
-// markup is the final frame. The row already says what the skill does, so assistive
-// technology skips the figure.
-import { FIGURE_HEIGHT, skillFigures } from '../data/skill-figures.mjs';
+// One skill's scene in «Qué le puedes pedir» (src/data/skill-figures.mjs): a story without
+// text. Its steps follow the scroll, forward and back, where the browser has scroll timelines,
+// and play once in time as the scene comes into view otherwise (scene.css). The markup is the
+// final frame. The text beside it already says what the skill does, so assistive technology
+// skips the drawing.
+import { FIGURE_HEIGHT, FIGURE_WIDTH, skillFigures } from '../data/skill-figures.mjs';
 import '../styles/scene.css';
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const figure = skillFigures[Astro.props.name];
-if (!figure) throw new Error(`src/data/skill-figures.mjs no tiene la figura de ${Astro.props.name}.`);
+if (!figure) throw new Error(`src/data/skill-figures.mjs no tiene la escena de ${Astro.props.name}.`);
 // Drawn strokes measure 1, so scene.css draws any of them with the same dash. The class goes
 // apart from the spread, where Astro would replace it with its scope class.
 const attributes = (className: string, attrs: Record<string, string | number>) => ({
@@ -21,7 +21,7 @@ const attributes = (className: string, attrs: Record<string, string | number>) =
 });
 ---
 
-<svg class="scene-art skill-figure" viewBox={`0 0 ${figure.width} ${FIGURE_HEIGHT}`} aria-hidden="true" focusable="false">
+<svg class="scene-art skill-figure" viewBox={`0 0 ${FIGURE_WIDTH} ${FIGURE_HEIGHT}`} aria-hidden="true" focusable="false">
 	{
 		figure.parts.map(([Tag, className, attrs, children]) => (
 			<Tag class={className} {...attributes(className, attrs)}>
@@ -34,8 +34,8 @@ const attributes = (className: string, attrs: Record<string, string | number>) =
 <script>
 	import { belowScreen, playOnView, reducedMotion } from '../lib/play-on-view';
 
-	// Decides how the skill figures move (scene.css). data-motion records the mode: "scroll"
-	// where CSS has scroll timelines, "time" otherwise. Only a figure still below the screen
+	// Decides how the skill scenes move (scene.css). data-motion records the mode: "scroll"
+	// where CSS has scroll timelines, "time" otherwise. Only a scene still below the screen
 	// moves, so one already visible keeps its final frame and never flickers. With the scroll
 	// (data-play="scroll") its story follows the scroll, forward and back. In time it plays
 	// once as it comes into view (playOnView). With reduced motion nothing moves.
@@ -50,11 +50,9 @@ const attributes = (className: string, attrs: Record<string, string | number>) =
 </script>
 
 <style>
-	/* The ledger row sets the box of the widest drawing (--figure-width, 160 × 80 units), so
-	   every drawing is half that high and as wide as its own viewBox. */
+	/* As wide as its place in the row, as high as its drawing. */
 	svg {
-		width: auto;
-		max-width: 100%;
-		height: calc(var(--figure-width, var(--skill-figure-width)) / 2);
+		width: 100%;
+		height: auto;
 	}
 </style>

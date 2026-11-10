@@ -1,9 +1,12 @@
 ---
 // Replaces Starlight's Hero on the splash landings: the headline, one sentence and the actions
 // from the page's frontmatter and, on pages with `install: true`, the install commands of the
-// latest release beside them (tabs per client). Starlight's 404 page also uses this hero.
+// latest release below them (tabs per client) and the scene of the plugin at work: beside them
+// on a wide hero, after them in one column. Starlight's 404 page also uses this hero, without
+// commands or scene.
 import { LinkButton, TabItem, Tabs } from '@astrojs/starlight/components';
 import InstallCommand from './InstallCommand.astro';
+import Scene from './Scene.astro';
 import { release } from '../lib/release';
 
 const { data } = Astro.locals.starlightRoute.entry;
@@ -12,7 +15,7 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 ---
 
 <div class="hero-frame">
-<div class="hero">
+<div class:list={['hero', { 'with-scene': clients.length > 0 }]}>
 	<div class="lead">
 		<h1 id="_top" data-page-title set:html={title} />
 		{tagline && <p class="tagline" set:html={tagline} />}
@@ -38,13 +41,18 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 							{client.command.split('\n').map((command, index) => <InstallCommand {command} number={index + 1} />)}
 						</div>
 						<p class="then">
-							{Astro.locals.t('peqa.install.then')} <code>{client.invoke}</code>
+							{Astro.locals.t('peqa.install.then')} <code class="scroll-edges">{client.invoke}</code>
 						</p>
 					</TabItem>
 				))
 			}
 		</Tabs>
 	</section>
+	)}
+	{clients.length > 0 && (
+	<div class="scene">
+		<Scene />
+	</div>
 	)}
 </div>
 </div>
@@ -70,6 +78,9 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		letter-spacing: var(--tracking-tight);
 		color: var(--color-text);
 		text-wrap: balance;
+		/* Only a word wider than the column, as with text at 200 % at 320 px, breaks instead of
+		   widening the page; other lines break as before. */
+		overflow-wrap: anywhere;
 	}
 	.tagline {
 		max-width: var(--measure);
@@ -82,6 +93,12 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		flex-wrap: wrap;
 		align-items: center;
 		gap: var(--space-3) var(--space-5);
+	}
+	/* A label wider than the column (320 px with text at 200 %) breaks with a hyphen where the
+	   page's language allows, and anywhere as a last resort, instead of widening the page. */
+	.actions :global(.sl-link-button) {
+		hyphens: auto;
+		overflow-wrap: anywhere;
 	}
 	/* Below Starlight's nav breakpoint, pages without sidebar have no language picker. */
 	.language {
@@ -141,20 +158,50 @@ const clients = data.install ? [release.install.claudeCode, release.install.code
 		font-family: var(--font-mono);
 		font-size: var(--text-xs);
 		padding: var(--space-1) var(--space-2);
-		background: var(--color-code-bg);
 		border: var(--border-width) solid var(--color-code-border);
 	}
 	/* The hero's width decides its columns, in its own em, so text at 200 % stacks them. */
 	.hero-frame {
 		container: hero / inline-size;
 	}
-	/* Token --breakpoint-hero: headline and install commands side by side. */
+	.scene {
+		min-width: 0;
+	}
+	/* Token --breakpoint-scene: a column too narrow for the scene at its smallest unit, as a
+	   phone with text at 200 %, hides it. Its text would not grow with the reader's. */
+	@container hero (max-width: 17.875em) {
+		.scene {
+			display: none;
+		}
+	}
+	/* Token --breakpoint-hero: two columns. */
 	@container hero (min-width: 60em) {
 		.hero {
 			grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
 			align-items: center;
 			gap: var(--space-8);
 			padding-block: var(--section-space);
+		}
+		/* On the landings the headline, its actions and the install commands share the left
+		   column and the scene takes the right one, against the content's right edge. */
+		.with-scene {
+			grid-template-areas:
+				'lead scene'
+				'install scene';
+			align-items: start;
+			row-gap: var(--space-7);
+			padding-block: var(--space-7);
+		}
+		.with-scene .lead {
+			grid-area: lead;
+		}
+		.with-scene .install {
+			grid-area: install;
+		}
+		.with-scene .scene {
+			grid-area: scene;
+			align-self: center;
+			--hero-scene-justify: flex-end;
 		}
 	}
 </style>

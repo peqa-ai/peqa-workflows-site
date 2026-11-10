@@ -1,0 +1,121 @@
+---
+// The landing's hero scene, translated from peqa.ai's Scene.js (scene `peqa-workflows`): two
+// pieces, the agent session and the pull request, each its own SVG with its own viewBox, side
+// by side where the column fits both and stacked otherwise, as peqa.ai's pieces wrap. It tells
+// one story in beats of --scene-beat (scene.css), once: b1 plays at the second beat, and it
+// ends with the pull request merged. It starts on load or, if it is still below the screen
+// then, once the pull request, where it ends, is all in view. The markup is the final frame.
+// Assistive technology reads the scene as one image described by its story.
+import { sceneCopy } from '../data/scene';
+import '../styles/scene.css';
+
+const t = sceneCopy[Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es'];
+// The three subagents start together; the first finishes a beat before the other two.
+const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, done: index > 0 ? 'b3' : 'b2' }));
+---
+
+<figure class="hero-scene" role="img" aria-label={t.label}>
+	{/* The agent session: the request, then three subagents working in parallel. */}
+	<svg class="scene-art" viewBox="0 0 260 188" aria-hidden="true" focusable="false">
+		<rect class="screen" x="2" y="2" width="256" height="184" />
+		<text class="label" x="14" y="22">{t.session}</text>
+		<line class="rule" x1="2" y1="32" x2="258" y2="32" />
+		<rect class="panel" x="14" y="42" width="232" height="42" />
+		<path class="icon" d="M21 49l4 4-4 4" />
+		<g class="enter">
+			<text class="small" x="32" y="57">{t.command}</text>
+			<text class="small" x="32" y="74" data-example>{t.request}</text>
+		</g>
+		<g class="enter b1">
+			<text class="label" x="14" y="106">{t.subagents}</text>
+			{
+				agents.map(({ name, file, y }) => (
+					<>
+						<text class="small" x="14" y={y}>{name}</text>
+						<text class="label" x="86" y={y}>{file}</text>
+					</>
+				))
+			}
+		</g>
+		{
+			agents.map(({ y, done }, index) => (
+				<>
+					<g class:list={['interim', 'b1', index > 0 && 'span2']}>
+						<rect class="accent breathe" x="231" y={y - 9} width="7" height="7" />
+					</g>
+					<path class:list={['check', 'enter', done]} d={`M228 ${y - 4}l4 4 8-9`} />
+				</>
+			))
+		}
+	</svg>
+	{/* The pull request: it opens, revisa reviews it, the person decides the merge, the scene's
+	    one lit step, and it ends merged. The last line is the PR's state: «Abierto», then the
+	    question with its two buttons, then «Mezclado», a resulting status in ink. The buttons
+	    only show while the decision is taken, so the final frame shows no pending button. */}
+	<svg class="scene-art" viewBox="0 0 260 202" aria-hidden="true" focusable="false">
+		<rect class="screen" x="2" y="2" width="256" height="198" />
+		<text class="label" x="14" y="22">{t.pullRequest}</text>
+		<line class="rule" x1="2" y1="32" x2="258" y2="32" />
+		<g class="slide b4">
+			<text class="strong" x="14" y="56" data-example>{t.pr}</text>
+			<text class="small" x="14" y="76">{t.prTitle}</text>
+			<line class="rule" x1="14" y1="120" x2="246" y2="120" />
+		</g>
+		<g class="enter b5">
+			<text class="small" x="14" y="104">{t.review}</text>
+			<rect class="tag" x="134" y="91" width="110" height="18" />
+			<text class="tag-text" x="189" y="104" text-anchor="middle">{t.noFindings}</text>
+		</g>
+		<g class="interim b4 span2">
+			<rect class="ink" x="14" y="136" width="8" height="8" />
+			<text class="small" x="28" y="144">{t.open}</text>
+		</g>
+		<text class="enter b6" x="14" y="144">{t.ask}</text>
+		<g class="interim b6 span2">
+			<rect class="button lit b7" x="14" y="156" width="110" height="30" />
+			<text class="lit-text b7" x="69" y="175" text-anchor="middle">{t.merge}</text>
+			<text class="label" x="136" y="175">{t.later}</text>
+		</g>
+		<circle class="tap b7" cx="69" cy="171" r="16" />
+		<g class="enter b8">
+			<rect class="tag tag-ink" x="14" y="162" width="80" height="18" />
+			<text class="tag-text tag-ink" x="54" y="175" text-anchor="middle">{t.merged}</text>
+		</g>
+	</svg>
+</figure>
+
+<script>
+	import { belowScreen, playOnView, reducedMotion, withoutBox } from '../lib/play-on-view';
+
+	// On a phone the scene follows the install commands, below the screen at load: it waits on
+	// its first frame there and plays once its last piece, the pull request where the story
+	// ends, is all in view. A scene hidden at load (large text in a narrow column) waits too: a
+	// rotation or a smaller text size can show it later, and it must not play out of view.
+	const scene = document.querySelector<HTMLElement>('.hero-scene');
+	if (scene && !reducedMotion() && (belowScreen(scene) || withoutBox(scene))) {
+		playOnView([scene], { endsIn: (element) => element.lastElementChild });
+	}
+</script>
+
+<style>
+	/* The pieces wrap: side by side where the column fits both at their natural size, stacked
+	   otherwise. The hero may align them with --hero-scene-justify. */
+	.hero-scene {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		justify-content: var(--hero-scene-justify, flex-start);
+		gap: var(--space-4);
+		margin: 0;
+		min-width: 0;
+		font-size: var(--text-sm);
+	}
+	/* Each piece at its natural size, 260 units (its viewBox's width) at --scene-unit-hero, and
+	   never wider than the column. In em, so the scene grows with the reader's text; the hero
+	   hides it below --breakpoint-scene. */
+	svg {
+		width: calc(260 * var(--scene-unit-hero));
+		max-width: 100%;
+		height: auto;
+	}
+</style>

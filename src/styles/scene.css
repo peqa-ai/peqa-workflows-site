@@ -1,0 +1,402 @@
+/*
+ * The landing's SVG drawings: the hero scene (Scene.astro) and the skill figures
+ * (SkillFigure.astro), translated from peqa.ai's src/styles/Scene.module.css. Lengths inside a
+ * drawing are scene units of its viewBox. No literal values here.
+ *
+ * The rules outside the media queries draw the final frame: it is what shows without
+ * JavaScript, with reduced motion and in print. Motion only runs on screens that allow it and
+ * run scripts, so a page without JavaScript never animates.
+ */
+
+/* Roles, shared by every drawing. */
+.scene-art {
+	display: block;
+	overflow: visible;
+}
+.scene-art text {
+	font-family: var(--font-mono);
+	font-size: var(--scene-text);
+	fill: var(--color-text);
+}
+.scene-art .screen {
+	fill: var(--scene-screen);
+	stroke: var(--scene-edge);
+	stroke-width: var(--scene-stroke);
+}
+.scene-art .panel {
+	fill: var(--scene-panel);
+}
+.scene-art .rule {
+	stroke: var(--scene-edge);
+	stroke-width: var(--border-width);
+}
+.scene-art .icon {
+	fill: none;
+	stroke: var(--scene-icon);
+	stroke-width: var(--scene-stroke);
+}
+.scene-art .ink {
+	fill: var(--color-text);
+}
+.scene-art .ink-line {
+	fill: none;
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke);
+}
+.scene-art .line {
+	stroke: var(--scene-placeholder);
+	stroke-width: var(--scene-stroke-line);
+}
+.scene-art .accent {
+	fill: var(--color-accent);
+}
+.scene-art .accent-line {
+	fill: none;
+	stroke: var(--color-accent);
+	stroke-width: var(--scene-stroke-strong);
+}
+/* A finished task or an approval: a check in ink. The accent is kept for results. */
+.scene-art .check {
+	fill: none;
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke-strong);
+}
+/* Roles of the scene's buttons and states. An outlined button is an action being pressed. The
+   decisive step (lit) is filled in ink when pressed, so the only filled accent on the first
+   screen is the page's real button; the tap on it is the accent of that moment. An outline
+   (tag) is a resulting status: in the accent for a check that passed («Sin hallazgos»), in ink
+   (tag-ink) for the state the story ends in («Mezclado»). */
+.scene-art .button {
+	fill: var(--scene-panel);
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke);
+}
+.scene-art .tag {
+	fill: var(--scene-screen);
+	stroke: var(--color-accent);
+	stroke-width: var(--scene-stroke);
+}
+.scene-art .tag-text {
+	font-size: var(--scene-label);
+	font-weight: var(--scene-weight-strong);
+	fill: var(--color-accent);
+}
+.scene-art .tag.tag-ink {
+	stroke: var(--color-text);
+}
+.scene-art .tag-text.tag-ink {
+	fill: var(--color-text);
+}
+.scene-art .small {
+	font-size: var(--scene-label);
+}
+.scene-art .label {
+	font-size: var(--scene-label);
+	fill: var(--color-text-muted);
+}
+.scene-art .strong {
+	font-size: var(--scene-strong);
+	font-weight: var(--scene-weight-strong);
+}
+/* The guarded step switches on in ink, with its label at the size of the scene's other
+   labels. */
+.scene-art .lit {
+	fill: var(--color-text);
+	stroke: var(--color-text);
+	transform-box: fill-box;
+	transform-origin: center;
+}
+.scene-art .lit-text {
+	font-size: var(--scene-label);
+	font-weight: var(--weight-normal);
+	fill: var(--color-on-accent);
+}
+/* Seen only while a story plays: a working mark, a state about to change, the buttons of a
+   decision, a scan, a tap. */
+.scene-art :is(.interim, .scan, .tap) {
+	opacity: 0;
+}
+.scene-art .scan {
+	stroke: var(--color-accent);
+	stroke-width: var(--scene-stroke-strong);
+}
+.scene-art .tap {
+	fill: none;
+	stroke: var(--color-accent);
+	stroke-width: var(--scene-stroke);
+	transform-box: fill-box;
+	transform-origin: center;
+}
+
+/* Skill figures: no text, only the theme's commit graph. Its lines are the work advancing,
+   in the icon gray (4.3:1 on the page); squares are its nodes; the accent marks only the
+   result. */
+.skill-figure .flow {
+	fill: none;
+	stroke: var(--scene-icon);
+	stroke-width: var(--scene-stroke);
+}
+.skill-figure .node {
+	fill: var(--color-text);
+}
+.skill-figure .frame {
+	fill: var(--scene-screen);
+	stroke: var(--scene-icon);
+	stroke-width: var(--scene-stroke);
+}
+.skill-figure .slot {
+	fill: var(--color-surface);
+	stroke: var(--scene-icon);
+	stroke-width: var(--scene-stroke);
+}
+.skill-figure .filled {
+	fill: var(--color-text);
+	stroke: var(--color-text);
+}
+.skill-figure .swatch-line {
+	fill: none;
+	stroke: var(--color-text);
+	stroke-width: var(--scene-stroke);
+}
+.skill-figure .swatch-panel {
+	fill: var(--scene-panel);
+	stroke: var(--scene-icon);
+	stroke-width: var(--scene-stroke);
+}
+.skill-figure .inked {
+	stroke: var(--color-text);
+}
+.skill-figure .result {
+	stroke: var(--color-accent);
+	stroke-width: var(--scene-stroke-strong);
+}
+.skill-figure .accent-button {
+	fill: var(--color-accent);
+	stroke: var(--color-accent);
+}
+
+/* Story steps. The hero names the beat at which an element plays (b1 is the second beat);
+   a figure names its step (s1 to s4) and, inside a step, its place in a stagger. */
+.scene-art .b1 { --beat: 1; }
+.scene-art .b2 { --beat: 2; }
+.scene-art .b3 { --beat: 3; }
+.scene-art .b4 { --beat: 4; }
+.scene-art .b5 { --beat: 5; }
+.scene-art .b6 { --beat: 6; }
+.scene-art .b7 { --beat: 7; }
+.scene-art .b8 { --beat: 8; }
+.scene-art .span2 { --span: 2; }
+.scene-art .s1 { --step: 0; }
+.scene-art .s2 { --step: 1; }
+.scene-art .s3 { --step: 2; }
+.scene-art .s4 { --step: 3; }
+.scene-art .long { --span: 2; }
+.scene-art .lag0 { --lag: 0; --span: 0.5; }
+.scene-art .lag1 { --lag: 1; --span: 0.5; }
+.scene-art .lag2 { --lag: 2; --span: 0.5; }
+
+@keyframes scene-enter {
+	from {
+		opacity: 0;
+		transform: translateY(var(--scene-rise));
+	}
+}
+@keyframes scene-slide {
+	from {
+		opacity: 0;
+		transform: translateX(calc(var(--scene-rise) * -2));
+	}
+}
+@keyframes scene-light {
+	from {
+		fill: var(--scene-panel);
+		stroke: var(--color-text);
+	}
+	60% {
+		transform: scale(1.03);
+	}
+}
+@keyframes scene-light-text {
+	from {
+		fill: var(--color-text);
+	}
+}
+@keyframes scene-hold {
+	0% {
+		opacity: 0;
+		transform: translateY(var(--scene-rise));
+	}
+	12%,
+	90% {
+		opacity: 1;
+		transform: none;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+@keyframes scene-tap {
+	0% {
+		opacity: 0;
+		transform: scale(0.6);
+	}
+	30% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(1.4);
+	}
+}
+@keyframes scene-breathe {
+	50% {
+		opacity: 0.35;
+	}
+}
+/* A stroke drawn from its start (the element has pathLength="1"). */
+@keyframes scene-draw {
+	from {
+		stroke-dashoffset: 1;
+	}
+	to {
+		stroke-dashoffset: 0;
+	}
+}
+/* A placeholder line taking ink. */
+@keyframes scene-ink {
+	from {
+		stroke: var(--scene-placeholder);
+	}
+}
+/* An empty slot filling. */
+@keyframes scene-fill {
+	from {
+		fill: var(--color-surface);
+		stroke: var(--scene-icon);
+	}
+}
+/* An outline turning into the accent of a result. */
+@keyframes scene-outline {
+	from {
+		stroke: var(--scene-icon);
+	}
+}
+/* A button taking the accent. */
+@keyframes scene-accent {
+	from {
+		fill: var(--scene-panel);
+		stroke: var(--scene-icon);
+	}
+}
+/* A scanner crossing a diff at a constant speed, seen only while it moves. */
+@keyframes scene-scan {
+	0% {
+		opacity: 0;
+		transform: translateY(0);
+	}
+	5%,
+	95% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		transform: translateY(var(--scene-scan));
+	}
+}
+/* A note dropping into its place from above. */
+@keyframes scene-drop {
+	from {
+		transform: translateY(calc(var(--scene-rise) * -3));
+	}
+}
+/* A note coming out to the right of where it was. */
+@keyframes scene-shift-in {
+	from {
+		opacity: 0;
+		transform: translateX(calc(var(--scene-shift) * -1));
+	}
+}
+
+/* The hero scene: the page's one sequence that plays without anyone acting, once, on load or
+   as it comes into view. Screens only, so a page printed before it ends shows the final frame. */
+@media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+	.hero-scene .enter {
+		animation: scene-enter var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	.hero-scene .slide {
+		animation: scene-slide var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	.hero-scene .lit {
+		animation: scene-light var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	.hero-scene .lit-text {
+		animation: scene-light-text var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	.hero-scene .interim {
+		animation: scene-hold calc(var(--span, 1) * var(--scene-beat)) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) forwards;
+	}
+	/* Each working mark breathes once while it shows, so the breath ends with its agent. */
+	.hero-scene .breathe {
+		animation: scene-breathe calc(var(--span, 1) * var(--scene-beat)) ease-in-out calc(var(--beat, 0) * var(--scene-beat));
+	}
+	.hero-scene .tap {
+		animation: scene-tap calc(var(--scene-standard) * 2) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	/* A scene still below the screen at load waits on its first frame until it comes into
+	   view (play-on-view.ts sets data-play). */
+	.hero-scene[data-play='waiting'] * {
+		animation-play-state: paused;
+	}
+}
+
+/* Skill figures. The script (SkillFigure.astro) leaves a figure that is already on screen at
+   load in its final frame; one below the screen gets data-play: "scroll" to follow the scroll
+   (data-motion="scroll"), or "waiting" and then "run" to play once in time where scroll
+   timelines are missing (data-motion="time"). */
+@media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
+		animation-fill-mode: both;
+	}
+	/* A dash as long as the stroke and a longer gap, so the hidden stroke leaves no sliver. */
+	.skill-figure[data-play] .draw {
+		stroke-dasharray: 1 2;
+		animation-name: scene-draw;
+	}
+	.skill-figure[data-play] .enter { animation-name: scene-enter; }
+	.skill-figure[data-play] .ink { animation-name: scene-ink; }
+	.skill-figure[data-play] .fill { animation-name: scene-fill; }
+	.skill-figure[data-play] .outline { animation-name: scene-outline; }
+	.skill-figure[data-play] .accent-fill { animation-name: scene-accent; }
+	.skill-figure[data-play] .scan { animation-name: scene-scan; }
+	.skill-figure[data-play] .drop { animation-name: scene-drop; }
+	.skill-figure[data-play] .shift-in { animation-name: scene-shift-in; }
+
+	/* With the scroll: the figure's own view timeline drives its parts, forward and back. A
+	   step is a quarter of the story's stretch of the figure's contain range. */
+	@supports (animation-timeline: view()) {
+		.skill-figure[data-play='scroll'] {
+			view-timeline: --skill-figure block;
+		}
+		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
+			animation-duration: auto;
+			animation-timing-function: linear;
+			animation-timeline: --skill-figure;
+			animation-range-start: contain calc(var(--skill-figure-story) * (var(--step, 0) + var(--lag, 0) / 4) / 4);
+			animation-range-end: contain calc(var(--skill-figure-story) * (var(--step, 0) + var(--lag, 0) / 4 + var(--span, 1)) / 4);
+		}
+	}
+
+	/* In time: the figure waits on its first frame, then plays its story once. */
+	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
+		animation-duration: calc(var(--span, 1) * var(--scene-beat));
+		animation-timing-function: var(--scene-ease);
+		animation-delay: calc((var(--step, 0) + var(--lag, 0) / 4) * var(--scene-beat));
+	}
+	.skill-figure:is([data-play='waiting'], [data-play='run']) .scan {
+		animation-timing-function: linear;
+	}
+	.skill-figure[data-play='waiting'] * {
+		animation-play-state: paused;
+	}
+}

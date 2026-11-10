@@ -1,23 +1,21 @@
 ---
 // The skills of the README table «Qué le puedes pedir», in its order, as a ledger: the skill's
-// name, one sentence (src/data/skills.ts) and the example request of the README.
+// name, one sentence (src/data/skills.ts), the example request of the README and the skill's
+// figure (src/data/skill-figures.mjs). A skill without its sentence or its figure fails the build.
+import { skillFigures } from '../data/skill-figures.mjs';
 import { skillCopy } from '../data/skills';
 import { release } from '../lib/release';
+import { assertSkillCoverage } from '../lib/skill-coverage.mjs';
 import Ledger from './Ledger.astro';
 import LedgerRow from './LedgerRow.astro';
+import SkillFigure from './SkillFigure.astro';
 
 const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
 const copy = skillCopy[lang];
 const names = release.skills.map((skill) => skill.name);
-const missing = names.filter((name) => !copy[name]);
-const stale = Object.keys(copy).filter((name) => !names.includes(name));
-if (missing.length || stale.length) {
-	throw new Error(
-		`src/data/skills.ts (${lang}) no coincide con la tabla «Qué le puedes pedir» de ${release.release.tag}: ` +
-			[missing.length && `faltan ${missing.join(', ')}`, stale.length && `sobran ${stale.join(', ')}`].filter(Boolean).join('; ') +
-			'.',
-	);
-}
+const tag = release.release.tag;
+assertSkillCoverage({ skills: names, entries: copy, file: `src/data/skills.ts (${lang})`, tag });
+assertSkillCoverage({ skills: names, entries: skillFigures, file: 'src/data/skill-figures.mjs', tag, item: 'figuras para ' });
 const rows = release.skills.map((skill) => ({
 	name: skill.name,
 	summary: copy[skill.name].summary,
@@ -33,6 +31,7 @@ const rows = release.skills.map((skill) => ({
 				<p>
 					<q>{row.example}</q>
 				</p>
+				<SkillFigure slot="figure" name={row.name} />
 			</LedgerRow>
 		))
 	}

@@ -60,6 +60,20 @@ h1#_top,
 	height: auto;
 }
 
+/* Blocks that scroll sideways rather than break a command (the install commands and their
+   invocation): an edge shows a rule in the muted text color (over 3:1 on the block) while there
+   is more of the command past it. Local backgrounds in the block's own color cover the rule at
+   either end of the scroll, so a block that fits shows none. The technique of the diagrams'
+   shadows, with a rule that reads at a glance. */
+.scroll-edges {
+	background:
+		linear-gradient(var(--color-code-bg), var(--color-code-bg)) left / var(--space-2) 100% no-repeat local,
+		linear-gradient(var(--color-code-bg), var(--color-code-bg)) right / var(--space-2) 100% no-repeat local,
+		linear-gradient(var(--color-text-muted), var(--color-text-muted)) left / var(--scroll-edge-width) 100% no-repeat scroll,
+		linear-gradient(var(--color-text-muted), var(--color-text-muted)) right / var(--scroll-edge-width) 100% no-repeat scroll,
+		var(--color-code-bg);
+}
+
 .diagram-hint {
 	margin-top: var(--space-2);
 	font-size: var(--text-xs);
@@ -127,7 +141,8 @@ h1#_top,
 	border-radius: var(--radius);
 }
 /* Touch targets of Starlight's controls, as peqa.ai's: the search button (2.5rem high) and the
-   tabs reach --touch-target; a tab label stays on one line and the tab list scrolls instead. */
+   tabs reach --touch-target. A tab label stays on one line; tabs that do not fit beside each
+   other, as with text at 200 % on a phone, go to the next line, each with its own underline. */
 site-search button[data-open-modal] {
 	min-height: var(--touch-target);
 	min-width: var(--touch-target);
@@ -135,6 +150,21 @@ site-search button[data-open-modal] {
 starlight-tabs [role='tab'] {
 	min-height: var(--touch-target);
 	white-space: nowrap;
+}
+starlight-tabs [role='tablist'] {
+	flex-wrap: wrap;
+}
+/* The tab list's width decides, in its own em, so larger text stacks the tabs too. */
+starlight-tabs {
+	container-type: inline-size;
+}
+/* Token --breakpoint-tabs: stacked tabs each take the whole line, so their underlines have
+   the same length. */
+@container (max-width: 14.5em) {
+	starlight-tabs .tab,
+	starlight-tabs .tab > [role='tab'] {
+		flex: 1 1 100%;
+	}
 }
 
 /* The phone menu button: square and outlined like «Ver en GitHub», not a filled circle. */

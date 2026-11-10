@@ -75,8 +75,8 @@
 }
 
 /* A skill's row: its stretch runs from a little after its top shows to the end of its story.
-   The text comes in over the first half and the scene tells its story over the second
-   (scene.css). A row that fits the screen is pinned (reveal.ts sets data-pin and --pin-top):
+   The text comes in over the first half; the scene tells its story from --story-from to the
+   end (scene.css). A row that fits the screen is pinned (reveal.ts sets data-pin and --pin-top):
    it holds still, centered, for --skill-pin of scroll while the story plays, and the story
    ends a little before it lets go. */
 .skill {
@@ -85,6 +85,14 @@
 	--reveal-to: calc(var(--row-travel) + var(--pin-length, 0px) * 0.85);
 	--reveal-time: var(--skill-enter-time);
 	--in-share: 0.5;
+	--story-from: var(--story-from-under);
+}
+/* Token --breakpoint-skill-row: with the scene beside the text, its story starts as the name
+   comes in, so that side of the row is never empty while the text arrives. */
+@container skills (min-width: 52rem) {
+	.skill > .pin {
+		--story-from: var(--story-from-beside);
+	}
 }
 .skill .rule-top::before {
 	--at: 0;
@@ -118,16 +126,15 @@
 .skill .word:nth-child(9) { --word: 8; }
 .skill .word:nth-child(10) { --word: 9; }
 .skill .word:nth-child(11) { --word: 10; }
-/* The ambient layer: the scene drifts up into its place over the whole entrance. What its
-   drawing shows from its first frame (the budget's empty marks, a list) comes in last, right
-   before the story starts. */
+/* The ambient layer: the scene drifts up into its place over the whole entrance, and its
+   drawing takes opacity at its start. */
 .skill .scene {
 	--at: 0;
 	--len: 1;
 }
 .skill .skill-figure {
-	--at: 0.88;
-	--len: 0.12;
+	--at: 0.05;
+	--len: 0.15;
 }
 
 @keyframes reveal-rule {
@@ -193,8 +200,10 @@
 		max-width: 100%;
 	}
 
-	/* With the scroll: each part follows its scope's view timeline, forward and back. */
-	@supports (animation-timeline: view()) {
+	/* With the scroll: each part follows its scope's view timeline, forward and back. The test
+	   names what these rules really use, as reveal.ts does: a browser without all of it takes the
+	   timed path whole. */
+	@supports (animation-timeline: --reveal) and (view-timeline: --reveal block) and (animation-range-start: cover 1px) {
 		[data-play='scroll'] {
 			view-timeline: --reveal block;
 		}

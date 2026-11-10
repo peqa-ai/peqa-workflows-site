@@ -35,17 +35,23 @@ const { term } = Astro.props;
 		color: var(--color-text);
 		overflow-wrap: break-word;
 	}
-	/* A link reaches --touch-target high: its box grows above and below its line by
-	   --ledger-link-reach, and an equal negative margin keeps the line, and the row, as high as
-	   before. */
+	/* A link reaches --touch-target high without growing: an area that high is laid over it,
+	   centered on its text. The link keeps the box of its text, so the row keeps its height and
+	   the focus ring is drawn around the text, clear of the key above a stacked value. */
 	dd :global(a) {
-		display: inline-block;
-		padding-block: var(--ledger-link-reach);
-		margin-block: calc(var(--ledger-link-reach) * -1);
+		position: relative;
 		color: var(--color-text);
 		text-decoration: underline;
 		text-decoration-color: var(--color-accent);
 		text-underline-offset: var(--space-1);
+	}
+	dd :global(a::after) {
+		content: '';
+		position: absolute;
+		inset-inline: 0;
+		top: 50%;
+		height: var(--touch-target);
+		transform: translateY(-50%);
 	}
 	dd :global(a:hover) {
 		color: var(--color-accent);

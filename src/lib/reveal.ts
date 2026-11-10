@@ -4,6 +4,14 @@
 
 import { belowScreen, playOnView, reducedMotion } from './play-on-view';
 
+/**
+ * What the scroll-linked path really uses: a view timeline with a name, parts that follow it
+ * by that name, and ranges of its cover given as lengths. A browser that lacks any of them
+ * takes the timed path whole, rather than half of each. The same test guards the rules in
+ * reveal.css and scene.css.
+ */
+const SCROLL_PATH = ['animation-timeline: --reveal', 'view-timeline: --reveal block', 'animation-range-start: cover 1px'];
+
 /** The height the header keeps at the top of the screen, as the page's scroll padding says. */
 const headerHeight = () => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
 
@@ -47,7 +55,7 @@ function pinRows(rows: HTMLElement[]) {
 export function reveal() {
 	const scopes = [...document.querySelectorAll<HTMLElement>('[data-reveal]')];
 	if (!scopes.length || reducedMotion()) return;
-	const scroll = CSS.supports('animation-timeline: view()');
+	const scroll = SCROLL_PATH.every((declaration) => CSS.supports(declaration));
 	const below = scopes.filter(belowScreen);
 	for (const scope of scopes) scope.dataset.motion = scroll ? 'scroll' : 'time';
 	if (scroll) {

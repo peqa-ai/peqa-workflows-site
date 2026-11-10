@@ -109,7 +109,8 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 
 	// On a phone the scene follows the install commands, below the screen at load: it waits on
 	// its first frame there and plays once its last piece, the pull request where the story
-	// ends, is all in view. A scene hidden at load (large text in a narrow column) waits too: a
+	// ends, is all in view. If the reader scrolls on before it ends, it hurries to its end or
+	// keeps its final frame (see below). A scene hidden at load (large text in a narrow column) waits too: a
 	// rotation or a smaller text size can show it later, and it must not play out of view.
 	const scene = document.querySelector<HTMLElement>('.hero-scene');
 	if (scene && !reducedMotion()) {
@@ -137,6 +138,52 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 		const waits = 'IntersectionObserver' in window && (belowScreen(scene) || withoutBox(scene));
 		if (waits) playOnView([scene], { endsIn: (element) => element.lastElementChild });
 		else scene.dataset.play = 'run';
+
+		// The story never leaves the screen half told. Once it runs, when the scene starts to leave
+		// (less than nine tenths of it in view, or of the screen for a scene taller than it), it
+		// hurries to its end while it can still be seen; with about a third left, a reader
+		// scrolling faster than that sees it at its end at once. A scene that has gone above the
+		// screen without ever starting keeps its final frame. A hidden scene has no box: the
+		// observer above takes care of it.
+		const hurry = parseFloat(getComputedStyle(scene).getPropertyValue('--scene-hurry')) || 1;
+		let hurried = false;
+		let frame = 0;
+		const stop = () => {
+			removeEventListener('scroll', scrolled);
+			removeEventListener('resize', leaving);
+			cancelAnimationFrame(frame);
+		};
+		const leaving = () => {
+			if (scene.dataset.ended !== undefined) return stop();
+			const box = scene.getBoundingClientRect();
+			if (box.height <= 0) return;
+			const animations = scene.getAnimations({ subtree: true });
+			const running = scene.dataset.play === 'run';
+			if (running && animations.every((animation) => animation.playState === 'finished')) return stop();
+			if (box.bottom <= 0) {
+				end();
+				return stop();
+			}
+			if (!running) return;
+			const share = (Math.min(box.bottom, innerHeight) - Math.max(box.top, 0)) / Math.min(box.height, innerHeight);
+			if (share < 0.35) {
+				for (const animation of animations) animation.finish();
+				return stop();
+			}
+			if (!hurried && share < 0.9) {
+				hurried = true;
+				for (const animation of animations) animation.updatePlaybackRate(hurry);
+			}
+		};
+		const scrolled = () => {
+			if (frame) return;
+			frame = requestAnimationFrame(() => {
+				frame = 0;
+				leaving();
+			});
+		};
+		addEventListener('scroll', scrolled, { passive: true });
+		addEventListener('resize', leaving);
 	}
 </script>
 

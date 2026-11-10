@@ -109,7 +109,7 @@
 	--scene-beat: 500ms; /* one step of a story; the hero's stays under 5 s */
 	/* Entrance distance and scan travel, in scene units (lengths inside an SVG's viewBox). */
 	--scene-rise: 6px;
-	--scene-scan: 72px;
+	--scene-scan: 180px; /* the height of the diff in revisa's scene */
 	/* Scene type, in scene units, so it scales with the drawing. */
 	--scene-label: 11px;
 	--scene-text: 13px;
@@ -134,27 +134,38 @@
 	   its text would fall below 0.76 of the reader's text size, since an image's text does not
 	   follow the reader's text preference (repeated in @container). Source: round 1 of scoring. */
 	--breakpoint-scene: 17.875em;
-	/* How far the relevant note travels out of its stack in memoria-extraer, in scene units.
-	   Source: the figure's drawing. */
+	/* From this width of the hero scene's column, in its own em, the session and the pull request
+	   step down in a diagonal and the graph joins them: 400 units (the composition's width) at
+	   --scene-unit (repeated in @container). Source: the composition's drawing. */
+	--breakpoint-scene-wide: 27.5em;
+	/* The stepped composition, in scene units: 400 wide and 428 high, each piece 260 wide. A
+	   piece's share of the width is 260 / 400. Source: the composition's drawing. */
+	--scene-wide-ratio: 400 / 428;
+	--scene-wide-piece: 65%;
+	/* Skill scenes (SkillFigure.astro): one drawing of 400 × 220 units per skill, without text.
+	   Its width beside the text of a wide row: about 1.5 px per unit, so its 1.5-unit strokes
+	   read at 2 px or more; a narrow row gives it the whole line. Source: the drawings. */
+	--skill-scene-width: 38rem;
+	/* The stretch of a skill scene's way across the screen in which it tells its story, as
+	   shares of its cover range (from its top at the bottom of the screen to its bottom at the
+	   top): it starts a little after the scene comes in and ends with the scene near the middle
+	   of the screen. Source: the plan, measured at 1440 × 900 and 390 × 844. */
+	--skill-scene-from: 14%;
+	--skill-scene-span: 40%;
+	/* How far a note travels, in scene units: the relevant ones out of the catalogue in
+	   memoria-extraer, the approved ones into the pull request in memoria-guardar. Source: the
+	   scenes' drawings. */
 	--scene-shift: 80px;
-	/* Skill figures: the box of the widest drawing (160 × 80 units) beside the text of a wide
-	   ledger, and beside the skill's name when the ledger stacks; each drawing is as high and
-	   as wide as it draws. Source: the drawings at about 1 and 0.7 px per unit. */
-	--skill-figure-width: 10rem;
-	--skill-figure-width-compact: 7rem;
-	/* A figure tells its story while it scrolls from fully entered at the bottom of the screen
-	   (the start of its contain range, whose top is inset by Starlight's scroll-padding under
-	   the header) to this point of that range: at 1440 × 900 its top is then at about 59 % of
-	   the screen's height, a little below the middle of the area under the header. Source: the
-	   plan. */
-	--skill-figure-story: 40%;
-	/* From this ledger width a row with a figure puts it in a third column, right after the
-	   text's measure (repeated in @container). Source: an 11rem key, about 25rem of text and
-	   the figure. */
-	--ledger-figure-width: 48rem;
-	/* Below this ledger width the figure no longer fits beside «memoria-guardar» (about 9rem of
-	   mono at 1rem) and goes under the name (repeated in @container). */
-	--ledger-figure-stack-width: 17rem;
+	--scene-carry: 200px;
+	/* The name of a skill beside its scene: between the scale's --text-lg and --text-xl, below
+	   the section's title. Source: the editorial scale. */
+	--text-skill: clamp(1.563rem, 1.25rem + 1vw, 1.953rem);
+	/* From this width of the skill list a row puts the scene beside its text (repeated in
+	   @container). Source: about 20rem of text, the gap and a scene of 26rem or more. */
+	--breakpoint-skill-row: 52rem;
+	/* From this width the landing puts «Dónde funciona» and «Versión publicada» side by side
+	   (repeated in @container): two ledgers of an 11rem key and 20rem or more of value. */
+	--breakpoint-columns: 68rem;
 
 	/* Roles: what components and pages use. */
 	--color-surface: var(--background);

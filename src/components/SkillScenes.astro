@@ -1,0 +1,130 @@
+---
+// The skills of the README table «Qué le puedes pedir», in its order: for each, its name, one
+// sentence (src/data/skills.ts), the example request of the README and its scene
+// (src/data/skill-figures.mjs). A wide list puts each scene beside its text, against the
+// content's right edge; a narrow one puts it under the text. A skill without its sentence or
+// its scene fails the build.
+import { skillFigures } from '../data/skill-figures.mjs';
+import { skillCopy } from '../data/skills';
+import { release } from '../lib/release';
+import { assertSkillCoverage } from '../lib/skill-coverage.mjs';
+import SkillFigure from './SkillFigure.astro';
+
+const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
+const copy = skillCopy[lang];
+const names = release.skills.map((skill) => skill.name);
+const tag = release.release.tag;
+assertSkillCoverage({ skills: names, entries: copy, file: `src/data/skills.ts (${lang})`, tag });
+assertSkillCoverage({ skills: names, entries: skillFigures, file: 'src/data/skill-figures.mjs', tag, item: 'escenas para ' });
+const rows = release.skills.map((skill) => ({
+	name: skill.name,
+	summary: copy[skill.name].summary,
+	example: lang === 'es' ? skill.example : copy[skill.name].example,
+}));
+---
+
+<ul class="skills" role="list">
+	{
+		rows.map((row) => (
+			<li class="skill">
+				<div class="copy">
+					<h3>{row.name}</h3>
+					<p>{row.summary}</p>
+					<p class="ask">
+						<svg class="prompt" viewBox="0 0 8 12" aria-hidden="true" focusable="false">
+							<path d="M1 1l5 5-5 5" />
+						</svg>
+						<q>{row.example}</q>
+					</p>
+				</div>
+				<div class="scene">
+					<SkillFigure name={row.name} />
+				</div>
+			</li>
+		))
+	}
+</ul>
+
+<style>
+	.skills {
+		display: grid;
+		margin: 0;
+		padding: 0;
+		min-width: 0;
+		list-style: none;
+		container: skills / inline-size;
+	}
+	/* A rule opens each skill, as each row of the ledgers below. */
+	.skill {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--space-5);
+		padding-block: var(--space-6);
+		border-top: var(--border-width) solid var(--color-border);
+	}
+	.copy {
+		display: grid;
+		align-content: start;
+		gap: var(--space-3);
+		max-width: var(--measure);
+		min-width: 0;
+		color: var(--color-text);
+	}
+	h3 {
+		font-family: var(--font-brand);
+		font-weight: var(--weight-title);
+		font-size: var(--text-skill);
+		line-height: var(--leading-tight);
+		letter-spacing: var(--tracking-tight);
+		color: var(--color-text);
+		overflow-wrap: anywhere;
+	}
+	/* What you type in the session: mono in a block, as the install commands, after the
+	   prompt's mark. */
+	.ask {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		align-items: baseline;
+		gap: var(--space-3);
+		justify-self: start;
+		margin-top: var(--space-2);
+		padding: var(--space-3) var(--space-4);
+		background: var(--color-code-bg);
+		border: var(--border-width) solid var(--color-code-border);
+		font-family: var(--font-mono);
+		font-size: var(--text-xs);
+		line-height: var(--leading-body);
+	}
+	/* A word wider than the block (a phone with text at 200 %) breaks with a hyphen where the
+	   page's language allows, and anywhere only as a last resort. */
+	.ask q {
+		quotes: none;
+		hyphens: auto;
+		overflow-wrap: anywhere;
+	}
+	.prompt {
+		width: var(--space-2);
+		height: auto;
+		overflow: visible;
+		fill: none;
+		stroke: var(--color-text-muted);
+		stroke-width: var(--scene-stroke);
+	}
+	.scene {
+		min-width: 0;
+		max-width: var(--skill-scene-width);
+	}
+	/* Token --breakpoint-skill-row: the scene beside its text, against the right edge. */
+	@container skills (min-width: 52rem) {
+		.skill {
+			grid-template-columns: minmax(0, 1fr) minmax(0, var(--skill-scene-width));
+			align-items: center;
+			gap: var(--space-8);
+			padding-block: var(--space-7);
+		}
+		/* Beside a large drawing the sentence takes the next size up. */
+		.copy > p:not(.ask) {
+			font-size: var(--text-md);
+		}
+	}
+</style>

@@ -1,5 +1,5 @@
 /*
- * The landing's SVG drawings: the hero scene (Scene.astro) and the skill figures
+ * The landing's SVG drawings: the hero scene (Scene.astro) and the skill scenes
  * (SkillFigure.astro), translated from peqa.ai's src/styles/Scene.module.css. Lengths inside a
  * drawing are scene units of its viewBox. No literal values here.
  *
@@ -128,9 +128,9 @@
 	transform-origin: center;
 }
 
-/* Skill figures: no text, only the theme's commit graph. Its lines are the work advancing,
-   in the icon gray (4.3:1 on the page); squares are its nodes; the accent marks only the
-   result. */
+/* Skill scenes: no text, only the theme's commit graph. Its lines are the work advancing,
+   in the icon gray (4.3:1 on the page); squares are its nodes; one outline in the accent
+   marks the result. */
 .skill-figure .flow {
 	fill: none;
 	stroke: var(--scene-icon);
@@ -170,13 +170,15 @@
 	stroke: var(--color-accent);
 	stroke-width: var(--scene-stroke-strong);
 }
-.skill-figure .accent-button {
-	fill: var(--color-accent);
-	stroke: var(--color-accent);
+/* The place a note left when it travelled on: its outline, empty, in the icon gray (4.3:1). */
+.skill-figure .ghost {
+	fill: none;
+	stroke: var(--scene-icon);
+	stroke-width: var(--scene-stroke);
 }
 
 /* Story steps. The hero names the beat at which an element plays (b1 is the second beat);
-   a figure names its step (s1 to s4) and, inside a step, its place in a stagger. */
+   a skill scene names its step (s1 to s6) and, inside a step, its place in a stagger. */
 .scene-art .b1 { --beat: 1; }
 .scene-art .b2 { --beat: 2; }
 .scene-art .b3 { --beat: 3; }
@@ -190,6 +192,8 @@
 .scene-art .s2 { --step: 1; }
 .scene-art .s3 { --step: 2; }
 .scene-art .s4 { --step: 3; }
+.scene-art .s5 { --step: 4; }
+.scene-art .s6 { --step: 5; }
 .scene-art .long { --span: 2; }
 .scene-art .lag0 { --lag: 0; --span: 0.5; }
 .scene-art .lag1 { --lag: 1; --span: 0.5; }
@@ -282,13 +286,6 @@
 		stroke: var(--scene-icon);
 	}
 }
-/* A button taking the accent. */
-@keyframes scene-accent {
-	from {
-		fill: var(--scene-panel);
-		stroke: var(--scene-icon);
-	}
-}
 /* A scanner crossing a diff at a constant speed, seen only while it moves. */
 @keyframes scene-scan {
 	0% {
@@ -304,13 +301,13 @@
 		transform: translateY(var(--scene-scan));
 	}
 }
-/* A note dropping into its place from above. */
-@keyframes scene-drop {
+/* An approved note travelling to the right, from the place it leaves. */
+@keyframes scene-carry {
 	from {
-		transform: translateY(calc(var(--scene-rise) * -3));
+		transform: translateX(calc(var(--scene-carry) * -1));
 	}
 }
-/* A note coming out to the right of where it was. */
+/* A copy of a note coming out to the right. */
 @keyframes scene-shift-in {
 	from {
 		opacity: 0;
@@ -323,6 +320,11 @@
 @media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
 	.hero-scene .enter {
 		animation: scene-enter var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
+	}
+	/* The graph between the pieces, drawn from its start (pathLength="1"). */
+	.hero-scene .draw {
+		stroke-dasharray: 1 2;
+		animation: scene-draw var(--scene-beat) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
 	}
 	.hero-scene .slide {
 		animation: scene-slide var(--scene-standard) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
@@ -350,12 +352,12 @@
 	}
 }
 
-/* Skill figures. The script (SkillFigure.astro) leaves a figure that is already on screen at
+/* Skill scenes. The script (SkillFigure.astro) leaves a scene that is already on screen at
    load in its final frame; one below the screen gets data-play: "scroll" to follow the scroll
    (data-motion="scroll"), or "waiting" and then "run" to play once in time where scroll
    timelines are missing (data-motion="time"). */
 @media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
-	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
+	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .scan, .carry, .shift-in) {
 		animation-fill-mode: both;
 	}
 	/* A dash as long as the stroke and a longer gap, so the hidden stroke leaves no sliver. */
@@ -367,28 +369,27 @@
 	.skill-figure[data-play] .ink { animation-name: scene-ink; }
 	.skill-figure[data-play] .fill { animation-name: scene-fill; }
 	.skill-figure[data-play] .outline { animation-name: scene-outline; }
-	.skill-figure[data-play] .accent-fill { animation-name: scene-accent; }
 	.skill-figure[data-play] .scan { animation-name: scene-scan; }
-	.skill-figure[data-play] .drop { animation-name: scene-drop; }
+	.skill-figure[data-play] .carry { animation-name: scene-carry; }
 	.skill-figure[data-play] .shift-in { animation-name: scene-shift-in; }
 
-	/* With the scroll: the figure's own view timeline drives its parts, forward and back. A
-	   step is a quarter of the story's stretch of the figure's contain range. */
+	/* With the scroll: the scene's own view timeline drives its parts, forward and back. A
+	   step is a sixth of the story's stretch of the scene's cover range. */
 	@supports (animation-timeline: view()) {
 		.skill-figure[data-play='scroll'] {
 			view-timeline: --skill-figure block;
 		}
-		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
+		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .scan, .carry, .shift-in) {
 			animation-duration: auto;
 			animation-timing-function: linear;
 			animation-timeline: --skill-figure;
-			animation-range-start: contain calc(var(--skill-figure-story) * (var(--step, 0) + var(--lag, 0) / 4) / 4);
-			animation-range-end: contain calc(var(--skill-figure-story) * (var(--step, 0) + var(--lag, 0) / 4 + var(--span, 1)) / 4);
+			animation-range-start: cover calc(var(--skill-scene-from) + var(--skill-scene-span) * (var(--step, 0) + var(--lag, 0) / 4) / 6);
+			animation-range-end: cover calc(var(--skill-scene-from) + var(--skill-scene-span) * (var(--step, 0) + var(--lag, 0) / 4 + var(--span, 1)) / 6);
 		}
 	}
 
-	/* In time: the figure waits on its first frame, then plays its story once. */
-	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .drop, .shift-in) {
+	/* In time: the scene waits on its first frame, then plays its story once. */
+	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .scan, .carry, .shift-in) {
 		animation-duration: calc(var(--span, 1) * var(--scene-beat));
 		animation-timing-function: var(--scene-ease);
 		animation-delay: calc((var(--step, 0) + var(--lag, 0) / 4) * var(--scene-beat));

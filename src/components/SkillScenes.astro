@@ -4,11 +4,18 @@
 // (src/data/skill-figures.mjs). A wide list puts each scene beside its text, against the
 // content's right edge; a narrow one puts it under the text. A skill without its sentence or
 // its scene fails the build.
+//
+// Each row is a reveal scope (src/styles/reveal.css): its rule is drawn, its name rises from
+// under its line, its sentence takes opacity, its request is typed word by word, and then its
+// scene tells its story (scene.css), all following the row's way up the screen. The request's
+// words are inline spans, so it reads and copies as one sentence.
 import { skillFigures } from '../data/skill-figures.mjs';
 import { skillCopy } from '../data/skills';
 import { release } from '../lib/release';
 import { assertSkillCoverage } from '../lib/skill-coverage.mjs';
+import { words } from '../lib/words.mjs';
 import SkillFigure from './SkillFigure.astro';
+import '../styles/reveal.css';
 
 const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
 const copy = skillCopy[lang];
@@ -19,26 +26,37 @@ assertSkillCoverage({ skills: names, entries: skillFigures, file: 'src/data/skil
 const rows = release.skills.map((skill) => ({
 	name: skill.name,
 	summary: copy[skill.name].summary,
-	example: lang === 'es' ? skill.example : copy[skill.name].example,
+	example: words((lang === 'es' ? skill.example : copy[skill.name].example) ?? ''),
 }));
 ---
 
 <ul class="skills" role="list">
 	{
 		rows.map((row) => (
-			<li class="skill">
-				<div class="copy">
-					<h3>{row.name}</h3>
-					<p>{row.summary}</p>
-					<p class="ask">
-						<svg class="prompt" viewBox="0 0 8 12" aria-hidden="true" focusable="false">
-							<path d="M1 1l5 5-5 5" />
-						</svg>
-						<q>{row.example}</q>
-					</p>
-				</div>
-				<div class="scene">
-					<SkillFigure name={row.name} />
+			<li class="skill" data-reveal>
+				<div class="pin rule-top">
+					<div class="copy">
+						<h3 class="rv-mask">
+							<span class="rv rv-rise">{row.name}</span>
+						</h3>
+						<p class="summary rv rv-fade">{row.summary}</p>
+						<p class="ask rv rv-wipe">
+							<svg class="prompt" viewBox="0 0 8 12" aria-hidden="true" focusable="false">
+								<path d="M1 1l5 5-5 5" />
+							</svg>
+							<q>
+								{row.example.map((word, index) => (
+									<>
+										{index > 0 ? ' ' : ''}
+										<span class="word rv rv-type">{word}</span>
+									</>
+								))}
+							</q>
+						</p>
+					</div>
+					<div class="scene rv rv-drift">
+						<SkillFigure name={row.name} />
+					</div>
 				</div>
 			</li>
 		))
@@ -54,13 +72,13 @@ const rows = release.skills.map((skill) => ({
 		list-style: none;
 		container: skills / inline-size;
 	}
-	/* A rule opens each skill, as each row of the ledgers below. */
-	.skill {
+	/* A rule opens each skill, as each row of the ledgers below. The row's content is one block
+	   (.pin), which reveal.css holds still while the scene's story plays. */
+	.pin {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		gap: var(--space-5);
 		padding-block: var(--space-6);
-		border-top: var(--border-width) solid var(--color-border);
 	}
 	.copy {
 		display: grid;
@@ -71,7 +89,7 @@ const rows = release.skills.map((skill) => ({
 		color: var(--color-text);
 	}
 	/* The sentence avoids leaving its last word alone on a line. */
-	.copy > p:not(.ask) {
+	.summary {
 		text-wrap: pretty;
 	}
 	h3 {
@@ -123,7 +141,7 @@ const rows = release.skills.map((skill) => ({
 		.skills {
 			display: block;
 		}
-		.skill {
+		.pin {
 			grid-template-columns: minmax(0, 1fr) var(--skill-scene-width-print);
 			align-items: center;
 			gap: var(--space-5);
@@ -145,7 +163,7 @@ const rows = release.skills.map((skill) => ({
 	}
 	/* Token --breakpoint-skill-row: the scene beside its text, against the right edge. */
 	@container skills (min-width: 52rem) {
-		.skill {
+		.pin {
 			grid-template-columns: minmax(0, 1fr) minmax(0, var(--skill-scene-width));
 			align-items: center;
 			gap: var(--space-8);

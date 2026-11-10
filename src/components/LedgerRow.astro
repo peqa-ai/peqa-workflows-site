@@ -1,14 +1,15 @@
 ---
-// One ledger row: `term` in the mono key column, the slot as its value.
+// One ledger row: `term` in the mono key column, the slot as its value. Inside a reveal scope
+// (src/styles/reveal.css) its rule is drawn, its key uncovered and its value takes opacity.
 interface Props {
 	term: string;
 }
 const { term } = Astro.props;
 ---
 
-<div class="row">
-	<dt>{term}</dt>
-	<dd><slot /></dd>
+<div class="row rule-top">
+	<dt class="rv rv-wipe">{term}</dt>
+	<dd class="rv rv-fade"><slot /></dd>
 </div>
 
 <style>
@@ -18,7 +19,6 @@ const { term } = Astro.props;
 		align-items: baseline;
 		gap: var(--space-1) var(--space-4);
 		padding-block: var(--space-4);
-		border-top: var(--border-width) solid var(--color-border);
 	}
 	dt {
 		font-family: var(--font-mono);

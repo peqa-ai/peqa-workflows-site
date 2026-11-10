@@ -37,8 +37,8 @@
 	}
 }
 
-/* A section's parts: its rule, its title, then each row of its ledger a little after the one
-   before: rule, key, value. */
+/* A section's parts: its rule, its title, then each row of its ledger, or each point of its
+   list of points, a little after the one before: rule, key or heading, value or sentence. */
 /* Its stretch starts a little before its top shows, so no screen is left empty waiting for it. */
 .landing-section {
 	--reveal-from: calc(var(--reveal-lead) * -1);
@@ -54,23 +54,23 @@
 	--at: 0.08;
 	--len: 0.4;
 }
-.ledger .row {
+:is(.ledger .row, .points .point) {
 	--row-at: calc(0.2 + var(--row, 0) * 0.13);
 }
-.ledger .row:nth-child(2) { --row: 1; }
-.ledger .row:nth-child(3) { --row: 2; }
-.ledger .row:nth-child(4) { --row: 3; }
-.ledger .row:nth-child(5) { --row: 4; }
-.ledger .row:nth-child(6) { --row: 5; }
-.ledger .row.rule-top::before {
+:is(.ledger .row, .points .point):nth-child(2) { --row: 1; }
+:is(.ledger .row, .points .point):nth-child(3) { --row: 2; }
+:is(.ledger .row, .points .point):nth-child(4) { --row: 3; }
+:is(.ledger .row, .points .point):nth-child(5) { --row: 4; }
+:is(.ledger .row, .points .point):nth-child(6) { --row: 5; }
+:is(.ledger .row, .points .point).rule-top::before {
 	--at: var(--row-at);
 	--len: 0.3;
 }
-.ledger .row > dt {
+:is(.ledger .row > dt, .points .point > h3) {
 	--at: calc(var(--row-at) + 0.05);
 	--len: 0.25;
 }
-.ledger .row > dd {
+:is(.ledger .row > dd, .points .point > .text) {
 	--at: calc(var(--row-at) + 0.12);
 	--len: 0.3;
 }

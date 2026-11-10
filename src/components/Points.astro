@@ -1,0 +1,29 @@
+---
+// A short list of points: three or so blocks, each a heading and a sentence (Point.astro),
+// side by side on a wide page and one after another on a narrow one. Text only. Inside a
+// landing section it comes in with the scroll as the ledgers do (src/styles/reveal.css).
+---
+
+<div class="points-frame">
+	<ul class="points" role="list"><slot /></ul>
+</div>
+
+<style>
+	.points-frame {
+		container: points / inline-size;
+	}
+	.points {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	/* Token --breakpoint-points: side by side, in equal columns. */
+	@container points (min-width: 52rem) {
+		.points {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			column-gap: var(--space-8);
+		}
+	}
+</style>

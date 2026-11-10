@@ -205,6 +205,9 @@
 	/* From this width of the skill list a row puts the scene beside its text (repeated in
 	   @container). Source: about 20rem of text, the gap and a scene of 26rem or more. */
 	--breakpoint-skill-row: 52rem;
+	/* From this width a list of points puts them side by side (repeated in @container): three
+	   columns of 14rem or more of text and their gaps. Source: the points of «Para quién es». */
+	--breakpoint-points: 52rem;
 	/* From this width the landing puts «Dónde funciona» and «Versión publicada» side by side,
 	   five eighths and three (repeated in @container). Side by side their key column narrows to
 	   --ledger-key-width-compact, which fits «Claude Code» (11 characters of mono at 1rem), so

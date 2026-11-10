@@ -496,7 +496,8 @@
 
 /* Skill scenes. Each plays inside its row, a reveal scope (reveal.css, src/lib/reveal.ts): the
    row's text comes in over the first share of the row's stretch (--in-share) and the scene
-   tells its story, in ten steps, over the rest. A row that was on screen at load has no
+   tells its story, in ten steps, from --story-from to its end: beside the text it starts as
+   the name comes in, under it once the text is in. A row that was on screen at load has no
    data-play and keeps its final frame. With the scroll (data-play="scroll") the story follows
    the row's own view timeline, forward and back; in time ("waiting", then "run") it plays once
    after the row's text has come in. */
@@ -527,11 +528,12 @@
 		animation-timing-function: linear;
 	}
 
-	/* With the scroll: a step is a tenth of the story's share of the row's stretch. */
-	@supports (animation-timeline: view()) {
+	/* With the scroll: the story runs from --story-from to the end of the row's stretch, and a
+	   step is a tenth of that. */
+	@supports (animation-timeline: --reveal) and (view-timeline: --reveal block) and (animation-range-start: cover 1px) {
 		.skill[data-play='scroll'] .skill-figure :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .arc, .shift-in, .pulse, .slide-in, .pop, .seek) {
-			--story-at: calc(var(--in-share) + (1 - var(--in-share)) * (var(--step, 0) + var(--lag, 0) / 4) / 10);
-			--story-len: calc((1 - var(--in-share)) * var(--span, 1) / 10);
+			--story-at: calc(var(--story-from) + (1 - var(--story-from)) * (var(--step, 0) + var(--lag, 0) / 4) / 10);
+			--story-len: calc((1 - var(--story-from)) * var(--span, 1) / 10);
 			animation-duration: auto;
 			animation-timeline: --reveal;
 			animation-range-start: cover calc(var(--reveal-from) + (var(--reveal-to) - var(--reveal-from)) * var(--story-at));
@@ -539,11 +541,11 @@
 		}
 	}
 
-	/* In time: the scene waits on its first frame, then plays its story once, after the row's
-	   text has come in. */
+	/* In time: the scene waits on its first frame, then plays its story once, starting while
+	   the row's text comes in. */
 	.skill:is([data-play='waiting'], [data-play='run']) .skill-figure :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .arc, .shift-in, .pulse, .slide-in, .pop, .seek) {
 		animation-duration: calc(var(--span, 1) * var(--scene-step));
-		animation-delay: calc(var(--reveal-time) + (var(--step, 0) + var(--lag, 0) / 4) * var(--scene-step));
+		animation-delay: calc(var(--reveal-time) * var(--story-from) + (var(--step, 0) + var(--lag, 0) / 4) * var(--scene-step));
 	}
 	.skill[data-play='waiting'] .skill-figure * {
 		animation-play-state: paused;

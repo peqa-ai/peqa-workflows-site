@@ -84,8 +84,8 @@ export const skillFigures = {
 					{},
 					[
 						['rect', 'frame', { x: 140, y: y - 24, width: 60, height: 48 }],
-						['path', `line draw s5 lag${index}`, { d: `M150 ${y - 9}H190` }],
-						['path', `line draw s5 lag${index + 1}`, { d: `M150 ${y + 7}H170` }],
+						['path', `line draw s4 lag${index + 1}`, { d: `M150 ${y - 9}H190` }],
+						['path', `line draw s5 lag${index}`, { d: `M150 ${y + 7}H170` }],
 					],
 				],
 				['path', `check draw s6 lag${index}`, { d: `M178 ${y + 8}l4 4 8-9` }],
@@ -160,10 +160,11 @@ export const skillFigures = {
 						['path', `line inked draw ${answer} lag3`, { d: `M228 ${y + 7}H258` }],
 					],
 				],
-				['rect', `slot filled fill ${mark}`, { x: 300, y: y - 7, width: 14, height: 14 }],
+				// The round's mark comes in with its answer, and fills once the answer is written.
+				['g', `enter ${answer} lag2`, {}, [['rect', `slot filled fill ${mark}`, { x: 300, y: y - 7, width: 14, height: 14 }]]],
 			]),
 			['path', 'slot enter s8 lag2', { d: 'M146 140H196V176H162L154 184V176H146Z' }],
-			['rect', 'slot', { x: 300, y: 151, width: 14, height: 14 }],
+			['rect', 'slot enter s8 lag3', { x: 300, y: 151, width: 14, height: 14 }],
 			['path', 'flow draw s9 lag0', { d: 'M314 62C332 62 328 110 346 110' }],
 			['path', 'flow draw s9 lag0', { d: 'M314 110H346' }],
 			pulse('M314 62C332 62 328 110 346 110', 's9 lag2'),
@@ -195,8 +196,8 @@ export const skillFigures = {
 				{},
 				[
 					['rect', 'frame', { x: 120, y: 20, width: 180, height: 180 }],
-					['path', 'line inked draw s5 lag0', { d: 'M134 40H206' }],
-					['path', 'flow draw s5 lag1', { d: 'M134 56H286' }],
+					['path', 'line inked draw s4 lag2', { d: 'M134 40H206' }],
+					['path', 'flow draw s5 lag0', { d: 'M134 56H286' }],
 					['path', 'flow draw s5 lag2', { d: 'M183.5 68V186M236.5 68V186' }],
 					...[134, 187, 240].flatMap((x, plan) => [
 						['path', `line inked draw s6 lag${plan}`, { d: `M${x} 76H${x + 26}` }],
@@ -280,10 +281,18 @@ export const skillFigures = {
 				['path', 'flow draw s9 lag0', { d }],
 				pulse(d, 's9 lag2'),
 			]),
-			['rect', 'slot outline result s10 lag0', { x: 322, y: 101, width: 18, height: 18 }],
+			// The three review marks come in with the lines that reach them.
+			[
+				'g',
+				'enter s9 lag0',
+				{},
+				[
+					['rect', 'slot outline result s10 lag0', { x: 322, y: 101, width: 18, height: 18 }],
+					['rect', 'slot', { x: 346, y: 101, width: 18, height: 18 }],
+					['rect', 'slot', { x: 370, y: 101, width: 18, height: 18 }],
+				],
+			],
 			['path', 'accent-line draw s10 lag2', { d: 'M326 110.5l4 4 7-8' }],
-			['rect', 'slot', { x: 346, y: 101, width: 18, height: 18 }],
-			['rect', 'slot', { x: 370, y: 101, width: 18, height: 18 }],
 		],
 	},
 	// Three notes come in beside a pull request in the shape of the hero's; the first to be
@@ -302,7 +311,7 @@ export const skillFigures = {
 				'g',
 				'slide-in s2',
 				{},
-				[...pullRequest(264, 20, 124, 180), ...number(338, 24), ['path', 'flow', { d: 'M274 148H378' }], ...tag(274, 164, 's10')],
+				[...pullRequest(264, 20, 124, 180), ...number(338, 24)],
 			],
 			...[
 				[274, 1, 's3', 's4'],
@@ -325,6 +334,8 @@ export const skillFigures = {
 					['path', `check draw ${approve}`, { d: `M${x + 22} 121l4 4 8-9` }],
 				],
 			]),
+			// The pull request's status comes in once the notes are in it.
+			['g', 'enter s9 lag2', {}, [['path', 'flow', { d: 'M274 148H378' }], ...tag(274, 164, 's10')]],
 		],
 	},
 	// The catalogue of notes comes in; a seeking frame goes over it note by note, and the two on

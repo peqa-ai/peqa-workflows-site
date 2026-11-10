@@ -157,8 +157,10 @@
 	--reveal-section: 16rem;
 	--reveal-section-time: 900ms;
 	/* A skill's row holds still, centered on the screen, for this stretch of scroll while its
-	   scene tells its story (position: sticky), when it fits the screen. Source: the plan. */
-	--skill-pin: 55svh;
+	   scene ends its story (position: sticky), when it fits the screen. Short, so the page with
+	   motion stays under six screens at 1440 × 900: the story already runs while the row comes
+	   up. Source: fase 5's plan (it was 55svh, and the page eight screens). */
+	--skill-pin: 20svh;
 	/* Where the top of a row that is not pinned (too tall for the screen) is when its story
 	   ends, from the top of the screen. Source: the plan. */
 	--skill-rest: 30svh;
@@ -199,10 +201,14 @@
 	   the longest value of «Dónde funciona», about 38rem, keeps to one line. Source: the rows. */
 	--breakpoint-columns: 80rem;
 	--ledger-key-width-compact: 7.5rem;
-	/* How far a link inside a ledger's value reaches above and below its line, so its touch
-	   area is --touch-target high while the row keeps its height. Source: WCAG 2.5.8 and the
-	   quality minimum of 44 px. */
-	--ledger-link-reach: calc((var(--touch-target) - 1em * var(--leading-body)) / 2);
+	/* Where a scene's story starts in its row's stretch, as a share of it: with the name's
+	   entrance where the scene sits beside the text, after the text where it sits under it.
+	   Source: fase 5's plan. */
+	--story-from-beside: 0.2;
+	--story-from-under: 0.5;
+	/* How many times faster the hero's story ends when it is leaving the screen half told.
+	   Source: its 4.3 s end within about half a second. */
+	--scene-hurry: 8;
 	/* The dash of an outline that marks where something was, in scene units. Source: the
 	   drawing of memoria-guardar. */
 	--scene-dash: 4px;

@@ -164,7 +164,12 @@
 	   motion stays under six screens at 1440 × 900: the story already runs while the row comes
 	   up. Source: fase 5's plan (it was 55svh, and the page eight screens). */
 	--skill-pin: 20svh;
-	/* The last row's hold: the sections after it follow at once. Source: the same finding. */
+	/* The hold of a row with its scene under its text (a phone): none. The room a row holds for
+	   lies under it until it lets go, and there it showed as a band of empty screen over the
+	   next rule; without it the rule keeps the usual distance, and the story ends as the row
+	   reaches the middle of the screen. The last row beside its text holds for a little, as the
+	   sections after it follow at once. Source: round 2 of fase 5's scoring. */
+	--skill-pin-under: 0svh;
 	--skill-pin-last: 8svh;
 	/* Where the top of a row that is not pinned (too tall for the screen) is when its story
 	   ends, from the top of the screen. Source: the plan. */
@@ -212,13 +217,13 @@
 	--story-from-beside: 0.1;
 	--story-from-under: 0.5;
 	/* The hero's story with the scroll, where the scene starts below the first screen (a phone):
-	   it starts once this much of the scene shows at the foot of the screen, and each of its
-	   beats takes this much scroll. The session's lines come in as the session does, and the
-	   pull request's as it does, so no window crosses the middle of the screen empty; the story
-	   ends with the pull request still in the lower half. Source: the scene's size in one column,
-	   about 30rem, and its 8.6 beats. */
-	--hero-scroll-from: 2rem;
-	--hero-scroll-beat: 3.75rem;
+	   each of its two windows tells its part over this share of its own entrance into the
+	   screen, from --hero-entry-from of it in to all but the rest. Shares of the window, not
+	   lengths, so they hold with any text size and screen. Source: code review 2/3 of fase 5
+	   (in rem, the story ended after the pull request had passed the middle of a low screen
+	   with large text). */
+	--hero-entry-from: 8%;
+	--hero-entry-span: 84%;
 	/* The dash of an outline that marks where something was, in scene units. Source: the
 	   drawing of memoria-guardar. */
 	--scene-dash: 4px;

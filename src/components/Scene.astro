@@ -113,8 +113,9 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 	//   this script starts it (data-play="run", scene.css), so it never plays before the script
 	//   can follow it, and it plays once.
 	// - Below the first screen (a phone, where it follows the install commands) with scroll
-	//   timelines: the story follows the scene's way up the screen, forward and back
-	//   (data-play="scroll"), so no window crosses the screen empty.
+	//   timelines: the story follows the scroll, forward and back (data-play="scroll"), each
+	//   window telling its part over its own entrance into the screen (scene.css), so none
+	//   crosses the screen empty, whatever the text size and the screen.
 	// - Below the first screen without them, or hidden at load (large text in a narrow column,
 	//   which a rotation may show later): it waits on its first frame and plays once in time, as
 	//   soon as its top comes into view.
@@ -132,7 +133,7 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 		if (above(scene.getBoundingClientRect())) {
 			scene.dataset.play = 'run';
 			end();
-		} else if (belowScreen(scene) && !withoutBox(scene) && scrollPath()) {
+		} else if (belowScreen(scene) && !withoutBox(scene) && scrollPath() && CSS.supports('timeline-scope: --hero-session')) {
 			scene.dataset.play = 'scroll';
 		} else {
 			if ('ResizeObserver' in window) {

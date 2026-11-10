@@ -45,6 +45,10 @@ const { term } = Astro.props;
 		text-decoration-color: var(--color-accent);
 		text-underline-offset: var(--space-1);
 	}
+	/* Room between the text and its focus ring. */
+	dd :global(a:focus-visible) {
+		outline-offset: var(--focus-width);
+	}
 	dd :global(a::after) {
 		content: '';
 		position: absolute;

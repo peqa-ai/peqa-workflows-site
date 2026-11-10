@@ -108,8 +108,19 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 	// ends, is all in view. A scene hidden at load (large text in a narrow column) waits too: a
 	// rotation or a smaller text size can show it later, and it must not play out of view.
 	const scene = document.querySelector<HTMLElement>('.hero-scene');
-	if (scene && !reducedMotion() && (belowScreen(scene) || withoutBox(scene))) {
-		playOnView([scene], { endsIn: (element) => element.lastElementChild });
+	if (scene && !reducedMotion()) {
+		if (belowScreen(scene) || withoutBox(scene)) playOnView([scene], { endsIn: (element) => element.lastElementChild });
+		// The story plays once. When CSS hides a scene that already started (larger text, a
+		// narrower column), display: none drops its animations and showing it again would play the
+		// story anew: data-ended keeps its final frame from then on (scene.css).
+		if ('ResizeObserver' in window) {
+			const hidden = new ResizeObserver(() => {
+				if (scene.dataset.play === 'waiting' || !withoutBox(scene)) return;
+				scene.dataset.ended = '';
+				hidden.disconnect();
+			});
+			hidden.observe(scene);
+		}
 	}
 </script>
 

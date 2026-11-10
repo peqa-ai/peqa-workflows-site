@@ -10,7 +10,7 @@ export const skillCopy: Record<'es' | 'en', Record<string, SkillCopy>> = {
 		},
 		idea: { summary: 'Cuestiona una idea o un plan, en tres rondas como máximo.' },
 		'ui-design': { summary: 'Diseña interfaces desde los tokens y componentes de tu proyecto. Opus y Codex puntúan el resultado.' },
-		revisa: { summary: 'Revisa un PR de forma independiente: pruebas, seguridad y alcance. Tres revisiones por PR como máximo.' },
+		revisa: { summary: 'Revisa un PR de forma independiente: pruebas, seguridad e impacto. Tres revisiones por PR como máximo.' },
 		'memoria-guardar': { summary: 'Guarda en un PR las notas del proyecto que apruebas una a una.' },
 		'memoria-extraer': { summary: 'Recupera las notas guardadas, todas o por tema, sin modificarlas.' },
 	},
@@ -28,7 +28,7 @@ export const skillCopy: Record<'es' | 'en', Record<string, SkillCopy>> = {
 			example: 'Design the pricing page with the components we already have',
 		},
 		revisa: {
-			summary: 'Reviews a PR independently: tests, security and blast radius. Three reviews per PR at most.',
+			summary: 'Reviews a PR independently: tests, security and impact. Three reviews per PR at most.',
 			example: 'Look for material bugs before closing this PR',
 		},
 		'memoria-guardar': {

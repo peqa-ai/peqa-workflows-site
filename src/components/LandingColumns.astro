@@ -1,5 +1,7 @@
 ---
-// Two landing sections side by side on a wide page, one after the other otherwise.
+// Two landing sections side by side on a wide page, one after the other otherwise. Side by
+// side, the first takes five eighths of the width and both ledgers a narrower key column, so
+// each value of «Dónde funciona» keeps to one line.
 ---
 
 <div class="landing-columns-frame not-content">
@@ -15,9 +17,10 @@
 		grid-template-columns: minmax(0, 1fr);
 	}
 	/* Token --breakpoint-columns. */
-	@container landing-columns (min-width: 68rem) {
+	@container landing-columns (min-width: 80rem) {
 		.landing-columns {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
+			--ledger-key-width: var(--ledger-key-width-compact);
+			grid-template-columns: minmax(0, 5fr) minmax(0, 3fr);
 			column-gap: var(--space-8);
 			align-items: start;
 		}

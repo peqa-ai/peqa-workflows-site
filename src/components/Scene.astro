@@ -109,18 +109,30 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 	// rotation or a smaller text size can show it later, and it must not play out of view.
 	const scene = document.querySelector<HTMLElement>('.hero-scene');
 	if (scene && !reducedMotion()) {
-		if (belowScreen(scene) || withoutBox(scene)) playOnView([scene], { endsIn: (element) => element.lastElementChild });
-		// The story plays once. When CSS hides a scene that already started (larger text, a
-		// narrower column), display: none drops its animations and showing it again would play the
-		// story anew: data-ended keeps its final frame from then on (scene.css).
+		// The story plays once. CSS holds it on its first frame until this script starts it
+		// (data-play="run", scene.css), so it never plays before the script can follow it. When CSS
+		// hides a scene that already started (larger text, a narrower column), display: none drops
+		// its animations and showing it again would play the story anew: data-ended keeps its final
+		// frame from then on.
+		const end = () => {
+			scene.dataset.ended = '';
+		};
 		if ('ResizeObserver' in window) {
 			const hidden = new ResizeObserver(() => {
-				if (scene.dataset.play === 'waiting' || !withoutBox(scene)) return;
-				scene.dataset.ended = '';
+				if (scene.dataset.play !== 'run' || !withoutBox(scene)) return;
+				end();
 				hidden.disconnect();
 			});
 			hidden.observe(scene);
+		} else {
+			// Without ResizeObserver the scene keeps its final frame as soon as its story ends.
+			scene.addEventListener('animationend', () => {
+				if (scene.getAnimations({ subtree: true }).every((animation) => animation.playState === 'finished')) end();
+			});
 		}
+		const waits = 'IntersectionObserver' in window && (belowScreen(scene) || withoutBox(scene));
+		if (waits) playOnView([scene], { endsIn: (element) => element.lastElementChild });
+		else scene.dataset.play = 'run';
 	}
 </script>
 

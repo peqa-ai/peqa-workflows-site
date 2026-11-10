@@ -361,9 +361,10 @@
 	.hero-scene .tap {
 		animation: scene-tap calc(var(--scene-standard) * 2) var(--scene-ease) calc(var(--beat, 0) * var(--scene-beat)) both;
 	}
-	/* A scene still below the screen at load waits on its first frame until it comes into
-	   view (play-on-view.ts sets data-play). */
-	.hero-scene[data-play='waiting'] * {
+	/* The script decides when the story plays (Scene.astro sets data-play="run"): until then, and
+	   while a scene below the screen waits for it ("waiting", play-on-view.ts), the scene holds its
+	   first frame. */
+	.hero-scene:not([data-play='run']) * {
 		animation-play-state: paused;
 	}
 	/* A scene hidden after its story started (Scene.astro sets data-ended) shows its final frame

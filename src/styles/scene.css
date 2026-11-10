@@ -366,6 +366,11 @@
 	.hero-scene[data-play='waiting'] * {
 		animation-play-state: paused;
 	}
+	/* A scene hidden after its story started (Scene.astro sets data-ended) shows its final frame
+	   when it comes back, instead of playing the story again. */
+	.hero-scene[data-ended] * {
+		animation: none;
+	}
 }
 
 /* Skill scenes. The script (SkillFigure.astro) leaves a scene that is already on screen at

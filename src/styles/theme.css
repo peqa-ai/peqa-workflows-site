@@ -187,10 +187,11 @@ starlight-tabs {
 }
 
 /* On paper (tokens.css turns the page's roles to ink) the dark surfaces stay as on screen: the
-   scenes, the install commands, the example requests, the code of the ledgers, the code blocks
-   of the docs and the accent button keep the screen's roles and print their own background. */
+   scenes, the install commands and the invocation after them, the example requests, the code of
+   the ledgers, the code blocks of the docs and the accent button keep the screen's roles and
+   print their own background. */
 @media print {
-	:is(.hero-scene, .skill-figure, .command pre, .ask, .ledger code, .expressive-code pre, .sl-link-button.primary) {
+	:is(.hero-scene, .skill-figure, .command pre, .then code, .ask, .ledger code, .expressive-code pre, .sl-link-button.primary) {
 		--color-surface: var(--background);
 		--color-text: var(--foreground);
 		--color-text-muted: var(--muted);
@@ -204,8 +205,8 @@ starlight-tabs {
 	:root:not([data-has-sidebar]) .content-panel footer {
 		display: none;
 	}
-	/* These two inherit their text color from the page around them: they take the role again. */
-	:is(.ask, .ledger code) {
+	/* These inherit their text color from the page around them: they take the role again. */
+	:is(.then code, .ask, .ledger code) {
 		color: var(--color-text);
 	}
 }

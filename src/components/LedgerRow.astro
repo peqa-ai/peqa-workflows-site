@@ -35,7 +35,13 @@ const { term } = Astro.props;
 		color: var(--color-text);
 		overflow-wrap: break-word;
 	}
+	/* A link reaches --touch-target high: its box grows above and below its line by
+	   --ledger-link-reach, and an equal negative margin keeps the line, and the row, as high as
+	   before. */
 	dd :global(a) {
+		display: inline-block;
+		padding-block: var(--ledger-link-reach);
+		margin-block: calc(var(--ledger-link-reach) * -1);
 		color: var(--color-text);
 		text-decoration: underline;
 		text-decoration-color: var(--color-accent);
@@ -47,9 +53,12 @@ const { term } = Astro.props;
 	dd :global(a:active) {
 		opacity: var(--press-opacity);
 	}
+	/* A code chip is higher than its line: a negative margin as deep as its padding keeps the
+	   line, and so every row of the ledger, at the same height with or without a chip. */
 	dd :global(code) {
 		display: inline-block;
 		max-width: 100%;
+		margin-block: calc(var(--space-1) * -1);
 		vertical-align: bottom;
 		overflow-wrap: anywhere;
 		font-family: var(--font-mono);

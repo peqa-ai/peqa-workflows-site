@@ -187,10 +187,10 @@ starlight-tabs {
 }
 
 /* On paper (tokens.css turns the page's roles to ink) the dark surfaces stay as on screen: the
-   scenes, the install commands, the example requests, the code of the ledgers and the accent
-   button keep the screen's roles and print their own background. */
+   scenes, the install commands, the example requests, the code of the ledgers, the code blocks
+   of the docs and the accent button keep the screen's roles and print their own background. */
 @media print {
-	:is(.hero-scene, .skill-figure, .command pre, .ask, .ledger code, .sl-link-button.primary) {
+	:is(.hero-scene, .skill-figure, .command pre, .ask, .ledger code, .expressive-code pre, .sl-link-button.primary) {
 		--color-surface: var(--background);
 		--color-text: var(--foreground);
 		--color-text-muted: var(--muted);
@@ -198,6 +198,11 @@ starlight-tabs {
 		--color-border: var(--line);
 		-webkit-print-color-adjust: exact;
 		print-color-adjust: exact;
+	}
+	/* Pages without sidebar (the landings and the 404) end in an empty footer: on paper it would
+	   take a sheet of its own when the content ends near the foot of one. */
+	:root:not([data-has-sidebar]) .content-panel footer {
+		display: none;
 	}
 	/* These two inherit their text color from the page around them: they take the role again. */
 	:is(.ask, .ledger code) {

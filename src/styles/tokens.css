@@ -146,9 +146,9 @@
 	   Its width beside the text of a wide row: about 1.5 px per unit, so its 1.5-unit strokes
 	   read at 2 px or more; a narrow row gives it the whole line. Source: the drawings. */
 	--skill-scene-width: 38rem;
-	/* On paper: two skills, each with its text and its scene, fit an A4 sheet. Source: the
-	   printed page, about 65rem high between its margins. */
-	--skill-scene-width-print: 26rem;
+	/* On paper a scene sits beside its text at this width, so the landing fits four A4 sheets
+	   or fewer. Source: the printed page, about 45rem wide between its margins. */
+	--skill-scene-width-print: 20rem;
 	/* The stretch of a skill scene's way across the screen in which it tells its story, as
 	   shares of its cover range (from its top at the bottom of the screen to its bottom at the
 	   top): it starts a little after the scene comes in and ends with the scene near the middle
@@ -160,9 +160,10 @@
 	   scenes' drawings. */
 	--scene-shift: 80px;
 	--scene-carry: 200px;
-	/* The name of a skill beside its scene: between the scale's --text-lg and --text-xl, below
-	   the section's title. Source: the editorial scale. */
-	--text-skill: clamp(1.563rem, 1.25rem + 1vw, 1.953rem);
+	/* The name of a skill beside its scene: from the scale's --text-md to its --text-lg, a step
+	   of 1.25 or more below the section's title at every width (20 px under 25 on a phone,
+	   24.6 under 34.6 at 1440). Source: the editorial scale and round 2 of scoring. */
+	--text-skill: clamp(1.25rem, 1rem + 0.6vw, 1.563rem);
 	/* From this width of the skill list a row puts the scene beside its text (repeated in
 	   @container). Source: about 20rem of text, the gap and a scene of 26rem or more. */
 	--breakpoint-skill-row: 52rem;
@@ -172,6 +173,13 @@
 	   the longest value of «Dónde funciona», about 38rem, keeps to one line. Source: the rows. */
 	--breakpoint-columns: 80rem;
 	--ledger-key-width-compact: 7.5rem;
+	/* How far a link inside a ledger's value reaches above and below its line, so its touch
+	   area is --touch-target high while the row keeps its height. Source: WCAG 2.5.8 and the
+	   quality minimum of 44 px. */
+	--ledger-link-reach: calc((var(--touch-target) - 1em * var(--leading-body)) / 2);
+	/* The dash of an outline that marks where something was, in scene units. Source: the
+	   drawing of memoria-guardar. */
+	--scene-dash: 4px;
 	/* Below this width of the skill list the example request puts its mark in line and tightens
 	   its sides (repeated in @container): a phone with text at 200 % is about 11rem wide, one at
 	   the default size 18rem or more. Source: round 1 of scoring. */
@@ -206,6 +214,10 @@
 		--color-text-muted: var(--scene-placeholder);
 		--color-accent: var(--background);
 		--color-border: var(--scene-icon);
+		/* Starlight's own accent on paper is a blue that is not the brand's: the active tab's
+		   underline and the links of the docs take the accent role, ink. */
+		--sl-color-accent: var(--color-accent);
+		--sl-color-text-accent: var(--color-accent);
 	}
 }
 

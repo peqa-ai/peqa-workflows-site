@@ -70,6 +70,10 @@ const rows = release.skills.map((skill) => ({
 		min-width: 0;
 		color: var(--color-text);
 	}
+	/* The sentence avoids leaving its last word alone on a line. */
+	.copy > p:not(.ask) {
+		text-wrap: pretty;
+	}
 	h3 {
 		font-family: var(--font-brand);
 		font-weight: var(--weight-title);
@@ -113,20 +117,18 @@ const rows = release.skills.map((skill) => ({
 		min-width: 0;
 		max-width: var(--skill-scene-width);
 	}
-	/* On paper the list and its skills flow as blocks, which a browser splits between sheets
-	   better than a grid's rows; a skill's text stays on the sheet of its scene. */
+	/* On paper the list flows as blocks, which a browser splits between sheets better than a
+	   grid's rows, and each skill stays whole on one sheet, its scene beside its text. */
 	@media print {
-		.skills,
-		.skill {
+		.skills {
 			display: block;
 		}
-		.copy {
+		.skill {
+			grid-template-columns: minmax(0, 1fr) var(--skill-scene-width-print);
+			align-items: center;
+			gap: var(--space-5);
+			padding-block: var(--space-4);
 			break-inside: avoid;
-			break-after: avoid;
-			margin-bottom: var(--space-5);
-		}
-		.scene {
-			max-width: var(--skill-scene-width-print);
 		}
 	}
 	/* Token --breakpoint-ask: in a list this narrow, as a phone with text at 200 %, the mark
@@ -148,10 +150,6 @@ const rows = release.skills.map((skill) => ({
 			align-items: center;
 			gap: var(--space-8);
 			padding-block: var(--space-7);
-		}
-		/* Beside a large drawing the sentence takes the next size up. */
-		.copy > p:not(.ask) {
-			font-size: var(--text-md);
 		}
 	}
 </style>

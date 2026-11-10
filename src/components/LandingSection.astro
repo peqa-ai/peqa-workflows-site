@@ -19,6 +19,12 @@ const { id, title } = Astro.props;
 		padding-block: var(--space-6);
 		border-top: var(--border-width) solid var(--color-border);
 	}
+	/* On paper a title stays on the sheet of what it opens. */
+	@media print {
+		h2 {
+			break-after: avoid;
+		}
+	}
 	h2 {
 		max-width: var(--heading-measure);
 		font-family: var(--font-brand);

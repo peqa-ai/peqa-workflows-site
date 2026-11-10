@@ -177,11 +177,13 @@
 	stroke: var(--color-accent);
 	stroke-width: var(--scene-stroke);
 }
-/* The place a note left when it travelled on: its outline, empty, in the icon gray (4.3:1). */
+/* The place a note left when it travelled on: a dashed outline, empty, in the icon gray
+   (4.3:1). */
 .skill-figure .ghost {
 	fill: none;
 	stroke: var(--scene-icon);
 	stroke-width: var(--scene-stroke);
+	stroke-dasharray: var(--scene-dash);
 }
 
 /* Story steps. The hero names the beat at which an element plays (b1 is the second beat);
@@ -417,8 +419,9 @@
 	}
 }
 
-/* On paper the page is white (tokens.css), and the drawings stay dark: each scene prints on
-   the brand's background, with room around what it draws, and whole on one sheet. */
+/* On paper the page is white (tokens.css), and the drawings stay dark: each skill scene
+   prints on the brand's background, with room around what it draws, and whole on one sheet.
+   The hero scene is left out (Hero.astro): its story needs a sheet of its own. */
 @media print {
 	:is(.hero-scene, .skill-figure) {
 		break-inside: avoid;

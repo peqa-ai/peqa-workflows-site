@@ -262,12 +262,13 @@ export const skillFigures = {
 	},
 	// Three notes beside a pull request in the shape of the hero's; two are approved, one after
 	// the other, and each travels into the pull request once it has its check; there their lines
-	// take ink and the pull request's status tag takes the accent. The note nobody approved stays
-	// where it was. Approved notes are drawn in the pull request, where they end, --scene-carry
-	// right of the places they leave, which stay marked.
+	// take ink and the pull request's status tag takes the accent. The note nobody approved gets
+	// a cross and stays where it was. Approved notes are drawn in the pull request, where they
+	// end, --scene-carry right of the places they leave, which stay marked with a dashed outline.
 	'memoria-guardar': {
 		parts: [
 			['g', '', {}, note(12, 62, 42, 72, NOTE_LINES.map((length) => [length, 'line']))],
+			['path', 'ink-line draw s5', { d: 'M35 115l9 9M44 115l-9 9' }],
 			['path', 'flow draw s2 long', { d: 'M178 98H264' }],
 			['rect', 'ghost', { x: 74, y: 62, width: 42, height: 72 }],
 			['rect', 'ghost', { x: 136, y: 62, width: 42, height: 72 }],

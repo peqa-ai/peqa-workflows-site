@@ -10,7 +10,10 @@ import { belowScreen, playOnView, reducedMotion } from './play-on-view';
  * takes the timed path whole, rather than half of each. The same test guards the rules in
  * reveal.css and scene.css.
  */
-const SCROLL_PATH = ['animation-timeline: --reveal', 'view-timeline: --reveal block', 'animation-range-start: cover 1px'];
+export const SCROLL_PATH = ['animation-timeline: --reveal', 'view-timeline: --reveal block', 'animation-range-start: cover 1px'];
+
+/** True where the browser has all of the scroll-linked path. */
+export const scrollPath = () => SCROLL_PATH.every((declaration) => CSS.supports(declaration));
 
 /** The height the header keeps at the top of the screen, as the page's scroll padding says. */
 const headerHeight = () => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
@@ -46,25 +49,47 @@ function pinRows(rows: HTMLElement[]) {
 }
 
 /**
+ * Each scope waits on its first frame (data-play="waiting") and plays once ("run") as soon as
+ * any part of it is on screen. Without IntersectionObserver nothing changes.
+ */
+function showOnEntry(scopes: HTMLElement[]) {
+	if (!('IntersectionObserver' in window)) return;
+	const observer = new IntersectionObserver((entries) => {
+		for (const entry of entries) {
+			if (!entry.isIntersecting) continue;
+			(entry.target as HTMLElement).dataset.play = 'run';
+			observer.unobserve(entry.target);
+		}
+	});
+	for (const scope of scopes) {
+		scope.dataset.play = 'waiting';
+		observer.observe(scope);
+	}
+}
+
+/**
  * data-motion records the mode on every scope: "scroll" where CSS has scroll timelines,
  * "time" otherwise. With the scroll a scope's parts follow its view timeline, forward and
  * back (data-play="scroll"), and the rows that fit the screen are pinned while their scene
- * plays. In time each scope plays once as it comes into view (playOnView). With reduced
- * motion nothing is turned on.
+ * plays. In time each scope's text plays once as it comes into view, and each row's drawing
+ * once the row is framed. With reduced motion nothing is turned on.
  */
 export function reveal() {
 	const scopes = [...document.querySelectorAll<HTMLElement>('[data-reveal]')];
 	if (!scopes.length || reducedMotion()) return;
-	const scroll = SCROLL_PATH.every((declaration) => CSS.supports(declaration));
+	const scroll = scrollPath();
 	const below = scopes.filter(belowScreen);
 	for (const scope of scopes) scope.dataset.motion = scroll ? 'scroll' : 'time';
 	if (scroll) {
 		for (const scope of below) scope.dataset.play = 'scroll';
 		pinRows(below.filter((scope) => scope.matches('.skill')));
 	} else {
-		// A section starts as its top comes in; a skill's row, once its whole content is on screen
-		// (or, taller than the screen, covers most of it), so its story is seen from its start.
-		playOnView(below.filter((scope) => !scope.matches('.skill')));
-		playOnView(below.filter((scope) => scope.matches('.skill')), { endsIn: (row) => row.firstElementChild });
+		// In time, two things start apart. A scope's text comes in as soon as any of it is on
+		// screen, so no text in view stays unseen waiting. A row's drawing waits for the row's
+		// whole content to be on screen (or, taller than the screen, to cover most of it), so its
+		// story is seen from its start (data-play on the drawing, scene.css).
+		showOnEntry(below);
+		const drawings = below.flatMap((scope) => [...scope.querySelectorAll<SVGSVGElement>(':scope > .pin svg.skill-figure')]);
+		playOnView(drawings, { endsIn: (drawing) => drawing.closest('.pin') });
 	}
 }

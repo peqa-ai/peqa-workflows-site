@@ -39,8 +39,9 @@
 
 /* A section's parts: its rule, its title, then each row of its ledger a little after the one
    before: rule, key, value. */
+/* Its stretch starts a little before its top shows, so no screen is left empty waiting for it. */
 .landing-section {
-	--reveal-from: 0px;
+	--reveal-from: calc(var(--reveal-lead) * -1);
 	--reveal-to: var(--reveal-section);
 	--reveal-time: var(--reveal-section-time);
 	--in-share: 1;
@@ -74,14 +75,15 @@
 	--len: 0.3;
 }
 
-/* A skill's row: its stretch runs from a little after its top shows to the end of its story.
+/* A skill's row: its stretch runs from its top showing to the end of its story, and its name
+   and the first piece of its scene come in at its start, so no gap is left over it.
    The text comes in over the first half; the scene tells its story from --story-from to the
    end (scene.css). A row that fits the screen is pinned (reveal.ts sets data-pin and --pin-top):
    it holds still, centered, for --skill-pin of scroll while the story plays, and the story
    ends a little before it lets go. */
 .skill {
 	--row-travel: calc(100svh - var(--pin-top, var(--skill-rest)));
-	--reveal-from: calc(var(--row-travel) * 0.15);
+	--reveal-from: calc(var(--row-travel) * 0.05);
 	--reveal-to: calc(var(--row-travel) + var(--pin-length, 0px) * 0.85);
 	--reveal-time: var(--skill-enter-time);
 	--in-share: 0.5;
@@ -94,25 +96,29 @@
 		--story-from: var(--story-from-beside);
 	}
 }
+/* The last row holds for less: the sections after it come right behind. */
+.skill:last-child {
+	--skill-pin: var(--skill-pin-last);
+}
 .skill .rule-top::before {
 	--at: 0;
 	--len: 0.3;
 }
 .skill h3 > .rv {
-	--at: 0.15;
-	--len: 0.35;
+	--at: 0.05;
+	--len: 0.3;
 }
 .skill .summary {
-	--at: 0.35;
+	--at: 0.25;
 	--len: 0.35;
 }
 .skill .ask {
-	--at: 0.55;
+	--at: 0.5;
 	--len: 0.2;
 }
 /* The words of the request, typed one after another. */
 .skill .word {
-	--at: calc(0.66 + var(--word, 11) * 0.028);
+	--at: calc(0.62 + var(--word, 11) * 0.03);
 	--len: 0.02;
 }
 .skill .word:nth-child(1) { --word: 0; }
@@ -152,14 +158,32 @@
 		clip-path: inset(calc(var(--space-2) * -1));
 	}
 }
+/* A name rising from under its line: it starts a little below its place, with what lies below
+   the line cut off, and the cut follows it up. The text never leaves its own box, so finding it
+   in the page leads to it. */
 @keyframes reveal-rise {
 	from {
 		transform: translateY(var(--reveal-rise));
+		clip-path: inset(calc(var(--space-2) * -1) calc(var(--space-2) * -1) var(--reveal-rise) calc(var(--space-2) * -1));
+	}
+	to {
+		clip-path: inset(calc(var(--space-2) * -1));
 	}
 }
 @keyframes reveal-fade {
 	from {
 		opacity: 0;
+	}
+}
+/* Unseen before its turn and whole from its first instant on: no step at the very end, which
+   a rounding of the animation's last moment could miss. */
+@keyframes reveal-type {
+	from {
+		opacity: 0;
+	}
+	1%,
+	to {
+		opacity: 1;
 	}
 }
 @keyframes reveal-drift {
@@ -184,16 +208,10 @@
 	[data-play] .rv-rise { animation-name: reveal-rise; }
 	[data-play] .rv-fade { animation-name: reveal-fade; }
 	[data-play] .rv-drift { animation-name: reveal-drift; }
-	/* A typed word shows at once, at the end of its turn. */
+	/* A typed word shows at once, at the start of its turn. */
 	[data-play] .rv-type {
-		animation-name: reveal-fade;
-		animation-timing-function: step-end;
-	}
-	/* The line a name rises from under: it hides what is below it, with room for descenders. */
-	[data-play] .rv-mask {
-		overflow: clip;
-		padding-block-end: var(--space-2);
-		margin-block-end: calc(var(--space-2) * -1);
+		animation-name: reveal-type;
+		animation-timing-function: linear;
 	}
 	.rv-rise {
 		display: inline-block;

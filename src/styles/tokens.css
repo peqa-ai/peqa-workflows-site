@@ -154,13 +154,18 @@
 	   the bottom of the screen: short, so it also ends at the foot of the page. In time, where
 	   scroll timelines are missing, the same takes --reveal-section-time. Source: fase 4's plan,
 	   measured at 1440 × 900 and 390 × 844. */
-	--reveal-section: 16rem;
+	--reveal-section: 12rem;
+	/* How far below the screen a section's top still is when its entrance starts. Source: round
+	   1 of fase 5's scoring: a gap was left over the tables while they came in. */
+	--reveal-lead: 6rem;
 	--reveal-section-time: 900ms;
 	/* A skill's row holds still, centered on the screen, for this stretch of scroll while its
 	   scene ends its story (position: sticky), when it fits the screen. Short, so the page with
 	   motion stays under six screens at 1440 × 900: the story already runs while the row comes
 	   up. Source: fase 5's plan (it was 55svh, and the page eight screens). */
 	--skill-pin: 20svh;
+	/* The last row's hold: the sections after it follow at once. Source: the same finding. */
+	--skill-pin-last: 8svh;
 	/* Where the top of a row that is not pinned (too tall for the screen) is when its story
 	   ends, from the top of the screen. Source: the plan. */
 	--skill-rest: 30svh;
@@ -171,9 +176,9 @@
 	/* The ambient layer: how far below its place a scene starts, so it arrives a little after
 	   its text. Source: motion-design, counter-motion at a fraction of the content's. */
 	--scene-drift: 2rem;
-	/* How far below its line a skill's name starts, hidden under it: past the room the line
-	   leaves for descenders, so no tip of it shows. */
-	--reveal-rise: 160%;
+	/* How far below its place a skill's name starts, as a share of its own height: all of it,
+	   cut off under its line. */
+	--reveal-rise: 100%;
 	/* A pulse's length, as a share of the line it runs. Source: the drawings. */
 	--scene-pulse: 0.14;
 	/* How high an approved note's arc rises, and the steps of the seeking frame over the
@@ -204,11 +209,16 @@
 	/* Where a scene's story starts in its row's stretch, as a share of it: with the name's
 	   entrance where the scene sits beside the text, after the text where it sits under it.
 	   Source: fase 5's plan. */
-	--story-from-beside: 0.2;
+	--story-from-beside: 0.1;
 	--story-from-under: 0.5;
-	/* How many times faster the hero's story ends when it is leaving the screen half told.
-	   Source: its 4.3 s end within about half a second. */
-	--scene-hurry: 8;
+	/* The hero's story with the scroll, where the scene starts below the first screen (a phone):
+	   it starts once this much of the scene shows at the foot of the screen, and each of its
+	   beats takes this much scroll. The session's lines come in as the session does, and the
+	   pull request's as it does, so no window crosses the middle of the screen empty; the story
+	   ends with the pull request still in the lower half. Source: the scene's size in one column,
+	   about 30rem, and its 8.6 beats. */
+	--hero-scroll-from: 2rem;
+	--hero-scroll-beat: 3.75rem;
 	/* The dash of an outline that marks where something was, in scene units. Source: the
 	   drawing of memoria-guardar. */
 	--scene-dash: 4px;

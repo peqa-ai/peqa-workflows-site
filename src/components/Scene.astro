@@ -6,8 +6,8 @@
 // they stack, as peqa.ai's pieces wrap, without the graph. It tells one story in beats of
 // --scene-beat (scene.css), once: b1 plays at the second beat, and it ends with the pull
 // request merged. The session types its command and the request, and a pulse runs each lane
-// of the graph down to the pull request. It starts on load or, if it is still below the screen
-// then, once the pull request, where it ends, is all in view. The markup is the final frame.
+// of the graph down to the pull request. On screen at load it plays once, by itself; below
+// the first screen it follows the scroll (see the script). The markup is the final frame.
 // Assistive technology reads the scene as one image described by its story.
 import { sceneCopy } from '../data/scene';
 import '../styles/scene.css';
@@ -106,84 +106,89 @@ const agents = t.agents.map((agent, index) => ({ ...agent, y: 126 + index * 20, 
 
 <script>
 	import { belowScreen, playOnView, reducedMotion, withoutBox } from '../lib/play-on-view';
+	import { scrollPath } from '../lib/reveal';
 
-	// On a phone the scene follows the install commands, below the screen at load: it waits on
-	// its first frame there and plays once its last piece, the pull request where the story
-	// ends, is all in view. If the reader scrolls on before it ends, it hurries to its end or
-	// keeps its final frame (see below). A scene hidden at load (large text in a narrow column) waits too: a
-	// rotation or a smaller text size can show it later, and it must not play out of view.
+	// How the story plays depends on where the scene is when this script starts.
+	// - On screen (a wide page): the one autonomous story. CSS holds it on its first frame until
+	//   this script starts it (data-play="run", scene.css), so it never plays before the script
+	//   can follow it, and it plays once.
+	// - Below the first screen (a phone, where it follows the install commands) with scroll
+	//   timelines: the story follows the scene's way up the screen, forward and back
+	//   (data-play="scroll"), so no window crosses the screen empty.
+	// - Below the first screen without them, or hidden at load (large text in a narrow column,
+	//   which a rotation may show later): it waits on its first frame and plays once in time, as
+	//   soon as its top comes into view.
+	// - Already above the screen (the module came late and the reader had moved on, a restored
+	//   scroll, an anchor): it keeps its final frame.
 	const scene = document.querySelector<HTMLElement>('.hero-scene');
 	if (scene && !reducedMotion()) {
-		// The story plays once. CSS holds it on its first frame until this script starts it
-		// (data-play="run", scene.css), so it never plays before the script can follow it. When CSS
-		// hides a scene that already started (larger text, a narrower column), display: none drops
-		// its animations and showing it again would play the story anew: data-ended keeps its final
-		// frame from then on.
+		// data-ended keeps the final frame: of a scene that CSS hides after its story started
+		// (display: none drops its animations, and showing it again would play the story anew), and
+		// of one the reader has left behind half told.
 		const end = () => {
 			scene.dataset.ended = '';
 		};
-		if ('ResizeObserver' in window) {
-			const hidden = new ResizeObserver(() => {
-				if (scene.dataset.play !== 'run' || !withoutBox(scene)) return;
-				end();
-				hidden.disconnect();
-			});
-			hidden.observe(scene);
+		const above = (box: DOMRect) => box.height > 0 && box.bottom <= 0;
+		if (above(scene.getBoundingClientRect())) {
+			scene.dataset.play = 'run';
+			end();
+		} else if (belowScreen(scene) && !withoutBox(scene) && scrollPath()) {
+			scene.dataset.play = 'scroll';
 		} else {
-			// Without ResizeObserver the scene keeps its final frame as soon as its story ends.
-			scene.addEventListener('animationend', () => {
-				if (scene.getAnimations({ subtree: true }).every((animation) => animation.playState === 'finished')) end();
-			});
-		}
-		const waits = 'IntersectionObserver' in window && (belowScreen(scene) || withoutBox(scene));
-		if (waits) playOnView([scene], { endsIn: (element) => element.lastElementChild });
-		else scene.dataset.play = 'run';
+			if ('ResizeObserver' in window) {
+				const hidden = new ResizeObserver(() => {
+					if (scene.dataset.play !== 'run' || !withoutBox(scene)) return;
+					end();
+					hidden.disconnect();
+				});
+				hidden.observe(scene);
+			} else {
+				// Without ResizeObserver the scene keeps its final frame as soon as its story ends.
+				scene.addEventListener('animationend', () => {
+					if (scene.getAnimations({ subtree: true }).every((animation) => animation.playState === 'finished')) end();
+				});
+			}
+			const waits = 'IntersectionObserver' in window && (belowScreen(scene) || withoutBox(scene));
+			if (waits) playOnView([scene]);
+			else scene.dataset.play = 'run';
 
-		// The story never leaves the screen half told. Once it runs, when the scene starts to leave
-		// (less than nine tenths of it in view, or of the screen for a scene taller than it), it
-		// hurries to its end while it can still be seen; with about a third left, a reader
-		// scrolling faster than that sees it at its end at once. A scene that has gone above the
-		// screen without ever starting keeps its final frame. A hidden scene has no box: the
-		// observer above takes care of it.
-		const hurry = parseFloat(getComputedStyle(scene).getPropertyValue('--scene-hurry')) || 1;
-		let hurried = false;
-		let frame = 0;
-		const stop = () => {
-			removeEventListener('scroll', scrolled);
-			removeEventListener('resize', leaving);
-			cancelAnimationFrame(frame);
-		};
-		const leaving = () => {
-			if (scene.dataset.ended !== undefined) return stop();
-			const box = scene.getBoundingClientRect();
-			if (box.height <= 0) return;
-			const animations = scene.getAnimations({ subtree: true });
-			const running = scene.dataset.play === 'run';
-			if (running && animations.every((animation) => animation.playState === 'finished')) return stop();
-			if (box.bottom <= 0) {
-				end();
-				return stop();
-			}
-			if (!running) return;
-			const share = (Math.min(box.bottom, innerHeight) - Math.max(box.top, 0)) / Math.min(box.height, innerHeight);
-			if (share < 0.35) {
-				for (const animation of animations) animation.finish();
-				return stop();
-			}
-			if (!hurried && share < 0.9) {
-				hurried = true;
-				for (const animation of animations) animation.updatePlaybackRate(hurry);
-			}
-		};
-		const scrolled = () => {
-			if (frame) return;
-			frame = requestAnimationFrame(() => {
-				frame = 0;
-				leaving();
-			});
-		};
-		addEventListener('scroll', scrolled, { passive: true });
-		addEventListener('resize', leaving);
+			// A story in time never leaves the screen half told: with about a third of the scene left
+			// in view (or of the screen, for a scene taller than it) it goes to its end at once, and a
+			// scene that has gone above the screen without ending, or without starting, keeps its
+			// final frame. A hidden scene has no box: the observer above takes care of it.
+			let frame = 0;
+			const stop = () => {
+				removeEventListener('scroll', scrolled);
+				removeEventListener('resize', leaving);
+				cancelAnimationFrame(frame);
+			};
+			const leaving = () => {
+				if (scene.dataset.ended !== undefined) return stop();
+				const box = scene.getBoundingClientRect();
+				if (box.height <= 0) return;
+				if (above(box)) {
+					end();
+					return stop();
+				}
+				if (scene.dataset.play !== 'run') return;
+				const animations = scene.getAnimations({ subtree: true });
+				if (animations.every((animation) => animation.playState === 'finished')) return stop();
+				const share = (Math.min(box.bottom, innerHeight) - Math.max(box.top, 0)) / Math.min(box.height, innerHeight);
+				if (share < 0.35) {
+					for (const animation of animations) animation.finish();
+					stop();
+				}
+			};
+			const scrolled = () => {
+				if (frame) return;
+				frame = requestAnimationFrame(() => {
+					frame = 0;
+					leaving();
+				});
+			};
+			addEventListener('scroll', scrolled, { passive: true });
+			addEventListener('resize', leaving);
+		}
 	}
 </script>
 

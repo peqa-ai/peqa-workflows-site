@@ -80,7 +80,7 @@ const rows = release.skills.map((skill) => ({
 		overflow-wrap: anywhere;
 	}
 	/* What you type in the session: mono in a block, as the install commands, after the
-	   prompt's mark. */
+	   prompt's mark. The mark has its own column, so the lines of a long request align. */
 	.ask {
 		display: grid;
 		grid-template-columns: auto minmax(0, 1fr);
@@ -95,11 +95,10 @@ const rows = release.skills.map((skill) => ({
 		font-size: var(--text-xs);
 		line-height: var(--leading-body);
 	}
-	/* A word wider than the block (a phone with text at 200 %) breaks with a hyphen where the
-	   page's language allows, and anywhere only as a last resort. */
+	/* It is text to type: lines break between words, and inside one only when it is wider than
+	   the block. */
 	.ask q {
 		quotes: none;
-		hyphens: auto;
 		overflow-wrap: anywhere;
 	}
 	.prompt {
@@ -113,6 +112,34 @@ const rows = release.skills.map((skill) => ({
 	.scene {
 		min-width: 0;
 		max-width: var(--skill-scene-width);
+	}
+	/* On paper the list and its skills flow as blocks, which a browser splits between sheets
+	   better than a grid's rows; a skill's text stays on the sheet of its scene. */
+	@media print {
+		.skills,
+		.skill {
+			display: block;
+		}
+		.copy {
+			break-inside: avoid;
+			break-after: avoid;
+			margin-bottom: var(--space-5);
+		}
+		.scene {
+			max-width: var(--skill-scene-width-print);
+		}
+	}
+	/* Token --breakpoint-ask: in a list this narrow, as a phone with text at 200 %, the mark
+	   goes in line with the text and the block's sides tighten, so the request keeps the width. */
+	@container skills (max-width: 16rem) {
+		.ask {
+			display: block;
+			padding-inline: var(--space-2);
+		}
+		.prompt {
+			display: inline;
+			margin-inline-end: var(--space-2);
+		}
 	}
 	/* Token --breakpoint-skill-row: the scene beside its text, against the right edge. */
 	@container skills (min-width: 52rem) {

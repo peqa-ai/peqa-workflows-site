@@ -146,6 +146,9 @@
 	   Its width beside the text of a wide row: about 1.5 px per unit, so its 1.5-unit strokes
 	   read at 2 px or more; a narrow row gives it the whole line. Source: the drawings. */
 	--skill-scene-width: 38rem;
+	/* On paper: two skills, each with its text and its scene, fit an A4 sheet. Source: the
+	   printed page, about 65rem high between its margins. */
+	--skill-scene-width-print: 26rem;
 	/* The stretch of a skill scene's way across the screen in which it tells its story, as
 	   shares of its cover range (from its top at the bottom of the screen to its bottom at the
 	   top): it starts a little after the scene comes in and ends with the scene near the middle
@@ -163,9 +166,16 @@
 	/* From this width of the skill list a row puts the scene beside its text (repeated in
 	   @container). Source: about 20rem of text, the gap and a scene of 26rem or more. */
 	--breakpoint-skill-row: 52rem;
-	/* From this width the landing puts «Dónde funciona» and «Versión publicada» side by side
-	   (repeated in @container): two ledgers of an 11rem key and 20rem or more of value. */
-	--breakpoint-columns: 68rem;
+	/* From this width the landing puts «Dónde funciona» and «Versión publicada» side by side,
+	   five eighths and three (repeated in @container). Side by side their key column narrows to
+	   --ledger-key-width-compact, which fits «Claude Code» (11 characters of mono at 1rem), so
+	   the longest value of «Dónde funciona», about 38rem, keeps to one line. Source: the rows. */
+	--breakpoint-columns: 80rem;
+	--ledger-key-width-compact: 7.5rem;
+	/* Below this width of the skill list the example request puts its mark in line and tightens
+	   its sides (repeated in @container): a phone with text at 200 % is about 11rem wide, one at
+	   the default size 18rem or more. Source: round 1 of scoring. */
+	--breakpoint-ask: 16rem;
 
 	/* Roles: what components and pages use. */
 	--color-surface: var(--background);
@@ -179,6 +189,24 @@
 	--color-code-bg: var(--scene-panel);
 	--color-code-border: var(--scene-edge);
 	--color-focus: var(--accent);
+}
+
+/*
+ * On paper the page is white, so the roles of whatever sits on it turn to ink: text and the
+ * accent of links and marks in the brand's background color (20:1 on white), secondary text in
+ * the scenes' darkest gray (12.8:1) and rules in the icon gray (4.7:1). Dark surfaces keep the
+ * screen's roles (theme.css). Source: the minimum contrast (round 1 of scoring found cream on
+ * white, 1.1:1) and Starlight's print stylesheet, which prints on white.
+ */
+@media print {
+	:root {
+		--paper: #ffffff;
+		--color-surface: var(--paper);
+		--color-text: var(--background);
+		--color-text-muted: var(--scene-placeholder);
+		--color-accent: var(--background);
+		--color-border: var(--scene-icon);
+	}
 }
 
 /*

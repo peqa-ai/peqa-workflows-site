@@ -8,7 +8,8 @@
 // `lag0`–`lag2` its place in a stagger inside that step and `long` a part that lasts two
 // steps. The markup is the final frame. Every drawing keeps FIGURE_MARGIN units free at each
 // side and ends at the right margin, so the scenes share their right edge at the end of a row.
-// One outline in the accent marks each story's result; nothing is filled with it.
+// One outline in the accent marks each story's result. The one filled accent is the brand's
+// button in ui-design's pricing page, kept small.
 
 /** @typedef {[string, string, Record<string, string | number>, Part[]?]} Part */
 /** @typedef {{ parts: Part[] }} Figure */
@@ -23,13 +24,33 @@ const note = (x, y, width, height, lines, frame = 'frame') => [
 	...lines.map(([length, classes], index) => ['path', classes, { d: `M${x + 8} ${y + 14 + index * 12}H${x + 8 + length}` }]),
 ];
 
+/**
+ * A pull request window at (x, y) in the shape of the hero's: the window, its header with the
+ * window's label, and the rule under it.
+ */
+const pullRequest = (x, y, width, height) => [
+	['rect', 'frame', { x, y, width, height }],
+	['path', 'line', { d: `M${x + 10} ${y + 10}H${x + 40}` }],
+	['path', 'flow', { d: `M${x} ${y + 20}H${x + width}` }],
+];
+/** The pull request's number at (x, y): a «#» and its digits as a line in ink. */
+const number = (x, y) => [
+	['path', 'ink-line', { d: `M${x + 3} ${y}v12M${x + 9} ${y}v12M${x} ${y + 4}h12M${x} ${y + 8}h12` }],
+	['path', 'line inked', { d: `M${x + 18} ${y + 6}H${x + 40}` }],
+];
+/** A status tag at (x, y), as the hero's «Sin hallazgos»: an outline in the accent with its check. */
+const tag = (x, y, step) => [
+	['rect', `slot outline result ${step} lag1`, { x, y, width: 44, height: 18 }],
+	['path', `accent-line draw ${step} lag2`, { d: `M${x + 16} ${y + 9.5}l4 4 8-9` }],
+];
+
 const NOTE_LINES = [26, 20, 14];
 
 /** @type {Record<string, Figure>} */
 export const skillFigures = {
 	// The request becomes a trunk, three lanes open, a subagent lands its work in each and gets
-	// its check, the parent merges the lanes and the pull request comes out, outlined in the
-	// accent.
+	// its check, the parent merges the lanes and the pull request opens, in the shape of the
+	// hero's, with its status tag outlined in the accent.
 	dirige: {
 		parts: [
 			[
@@ -37,42 +58,44 @@ export const skillFigures = {
 				'enter s1',
 				{},
 				[
-					['rect', 'frame', { x: 12, y: 86, width: 84, height: 48 }],
-					['path', 'ink-line', { d: 'M22 99l5 5-5 5' }],
-					['path', 'line inked', { d: 'M36 104H84' }],
-					['path', 'line', { d: 'M22 120H66' }],
+					['rect', 'frame', { x: 12, y: 86, width: 68, height: 48 }],
+					['path', 'ink-line', { d: 'M21 99l5 5-5 5' }],
+					['path', 'line inked', { d: 'M34 104H70' }],
+					['path', 'line', { d: 'M21 120H56' }],
 				],
 			],
-			['path', 'flow draw s2 lag0', { d: 'M96 110H124' }],
-			['path', 'flow draw s2 lag2', { d: 'M124 110C142 110 142 40 160 40H184' }],
-			['path', 'flow draw s2 lag2', { d: 'M124 110H184' }],
-			['path', 'flow draw s2 lag2', { d: 'M124 110C142 110 142 180 160 180H184' }],
+			['path', 'flow draw s2 lag0', { d: 'M80 110H100' }],
+			['path', 'flow draw s2 lag2', { d: 'M100 110C116 110 116 40 132 40H140' }],
+			['path', 'flow draw s2 lag2', { d: 'M100 110H140' }],
+			['path', 'flow draw s2 lag2', { d: 'M100 110C116 110 116 180 132 180H140' }],
 			...[40, 110, 180].flatMap((y, index) => [
 				[
 					'g',
 					`enter s3 lag${index}`,
 					{},
 					[
-						['rect', 'frame', { x: 184, y: y - 24, width: 72, height: 48 }],
-						['path', 'line', { d: `M194 ${y - 9}H244` }],
-						['path', 'line', { d: `M194 ${y + 7}H222` }],
+						['rect', 'frame', { x: 140, y: y - 24, width: 60, height: 48 }],
+						['path', 'line', { d: `M150 ${y - 9}H190` }],
+						['path', 'line', { d: `M150 ${y + 7}H170` }],
 					],
 				],
-				['path', `check draw s4 lag${index}`, { d: `M232 ${y + 8}l4 4 8-9` }],
+				['path', `check draw s4 lag${index}`, { d: `M178 ${y + 8}l4 4 8-9` }],
 			]),
-			['path', 'flow draw s5 lag0', { d: 'M256 40H280C298 40 298 110 316 110' }],
-			['path', 'flow draw s5 lag0', { d: 'M256 110H316' }],
-			['path', 'flow draw s5 lag0', { d: 'M256 180H280C298 180 298 110 316 110' }],
-			['rect', 'node enter s5 lag2', { x: 312, y: 106, width: 8, height: 8 }],
-			['path', 'flow draw s6 lag0', { d: 'M320 110H344' }],
+			['path', 'flow draw s5 lag0', { d: 'M200 40H216C234 40 234 110 252 110' }],
+			['path', 'flow draw s5 lag0', { d: 'M200 110H252' }],
+			['path', 'flow draw s5 lag0', { d: 'M200 180H216C234 180 234 110 252 110' }],
+			['rect', 'node enter s5 lag2', { x: 248, y: 106, width: 8, height: 8 }],
+			['path', 'flow draw s6 lag0', { d: 'M256 110H292' }],
 			[
 				'g',
-				'enter s6 lag2',
+				'enter s6 lag0',
 				{},
 				[
-					['rect', 'frame result', { x: 344, y: 84, width: 44, height: 52 }],
-					['path', 'line inked', { d: 'M354 102H378' }],
-					['path', 'line', { d: 'M354 118H370' }],
+					...pullRequest(292, 54, 96, 112),
+					...number(302, 84),
+					['path', 'line', { d: 'M302 108H366' }],
+					['path', 'flow', { d: 'M302 122H378' }],
+					...tag(302, 134, 's6'),
 				],
 			],
 		],
@@ -132,8 +155,10 @@ export const skillFigures = {
 			['path', 'check draw s6 lag2', { d: 'M358 111l5 5 11-12' }],
 		],
 	},
-	// The project's tokens (text, surface, border and type) flow into a screen, which takes ink
-	// from them; two reviewers score it, and its outline takes the accent.
+	// The project's tokens (text, surface, border and type) flow into a pricing page built with
+	// this brand's components: a title over a rule, three plans divided by rules, each with what
+	// it includes and its square button, the recommended plan's filled with the accent. Two
+	// reviewers score it.
 	'ui-design': {
 		parts: [
 			['rect', 'node enter s1 lag0', { x: 12, y: 30, width: 28, height: 28 }],
@@ -149,13 +174,18 @@ export const skillFigures = {
 				'enter s2 lag2',
 				{},
 				[
-					['rect', 'frame result outline s6 lag2', { x: 120, y: 20, width: 180, height: 180 }],
-					['path', 'line inked ink s3 lag0', { d: 'M136 42H206' }],
-					['rect', 'panel', { x: 134, y: 58, width: 152, height: 54 }],
-					['path', 'line inked ink s3 lag1', { d: 'M136 130H264' }],
-					['path', 'line inked ink s3 lag2', { d: 'M136 146H236' }],
-					['rect', 'slot filled fill s4', { x: 134, y: 164, width: 64, height: 20 }],
-					['rect', 'swatch-line', { x: 208, y: 164, width: 50, height: 20 }],
+					['rect', 'frame', { x: 120, y: 20, width: 180, height: 180 }],
+					['path', 'line inked ink s3 lag0', { d: 'M134 40H206' }],
+					['path', 'flow', { d: 'M134 56H286' }],
+					['path', 'flow', { d: 'M183.5 68V186M236.5 68V186' }],
+					...[134, 187, 240].flatMap((x, plan) => [
+						['path', `line inked ink s3 lag${plan}`, { d: `M${x} 76H${x + 26}` }],
+						['path', 'ink-line', { d: [100, 116, 132].slice(0, plan + 1).map((y) => `M${x} ${y}l2.5 2.5 5-5.5`).join('') }],
+						...[100, 116, 132].slice(0, plan + 1).map((y) => ['path', 'line', { d: `M${x + 14} ${y}H${x + 40}` }]),
+					]),
+					['rect', 'swatch-line', { x: 134, y: 160, width: 43, height: 18 }],
+					['rect', 'accent-button accent-fill s4', { x: 190, y: 160, width: 40, height: 18 }],
+					['rect', 'swatch-line', { x: 243, y: 160, width: 43, height: 18 }],
 				],
 			],
 			['path', 'flow draw s5 lag0', { d: 'M300 110C322 110 322 66 344 66' }],
@@ -166,24 +196,27 @@ export const skillFigures = {
 			['path', 'check draw s6 lag1', { d: 'M356 155l5 5 11-12' }],
 		],
 	},
-	// A diff; a scan crosses it at a constant speed; the review looks through three lenses
-	// (tests, security and blast radius) and each gets its check; then the first of three
-	// review marks takes its check and the accent outline. The other two stay empty: the budget.
+	// A diff, its removed and added lines marked «−» and «+» and drawn in ink; a scan crosses it
+	// at a constant speed; the review looks through three lenses (tests, security and impact) and
+	// each gets its check; then the first of three review marks takes its check and the accent
+	// outline. The other two stay empty: the budget.
 	revisa: {
 		parts: [
 			['rect', 'frame enter s1', { x: 12, y: 20, width: 140, height: 180 }],
 			...[
-				[120, 0],
-				[100, 0],
-				[132, 1],
-				[92, 1],
-				[126, 2],
-				[110, 2],
-				[84, 2],
-			].map(([end, lag], index) => ['path', `line draw s1 lag${lag}`, { d: `M36 ${44 + index * 20}H${end}` }]),
-			['rect', 'node enter s1 lag0', { x: 22, y: 62, width: 4, height: 4 }],
-			['rect', 'node enter s1 lag1', { x: 22, y: 122, width: 4, height: 4 }],
-			['rect', 'node enter s1 lag2', { x: 22, y: 142, width: 4, height: 4 }],
+				[120, 0, ''],
+				[100, 0, '-'],
+				[132, 1, '+'],
+				[92, 1, ''],
+				[126, 2, '-'],
+				[110, 2, '+'],
+				[84, 2, '+'],
+			].flatMap(([end, lag, mark], index) => {
+				const y = 44 + index * 20;
+				const line = ['path', `line${mark ? ' inked' : ''} draw s1 lag${lag}`, { d: `M38 ${y}H${end}` }];
+				const sign = `M21 ${y}h8${mark === '+' ? `M25 ${y - 4}v8` : ''}`;
+				return mark ? [line, ['path', `ink-line enter s1 lag${lag}`, { d: sign }]] : [line];
+			}),
 			['line', 'scan s2', { x1: 12, y1: 20, x2: 152, y2: 20 }],
 			['path', 'flow draw s3 lag0', { d: 'M152 110C172 110 172 50 192 50' }],
 			['path', 'flow draw s3 lag0', { d: 'M152 110H192' }],
@@ -227,19 +260,18 @@ export const skillFigures = {
 			['rect', 'slot', { x: 370, y: 101, width: 18, height: 18 }],
 		],
 	},
-	// Three notes beside the pull request; two are approved, one after the other, and each
-	// travels into the pull request once it has its check; there their lines take ink, and the
-	// pull request ends outlined in the accent. The note nobody approved stays where it was.
-	// Approved notes are drawn in the pull request, where they end, --scene-carry right of the
-	// places they leave, which stay marked.
+	// Three notes beside a pull request in the shape of the hero's; two are approved, one after
+	// the other, and each travels into the pull request once it has its check; there their lines
+	// take ink and the pull request's status tag takes the accent. The note nobody approved stays
+	// where it was. Approved notes are drawn in the pull request, where they end, --scene-carry
+	// right of the places they leave, which stay marked.
 	'memoria-guardar': {
 		parts: [
-			['g', '', {}, note(12, 74, 42, 72, NOTE_LINES.map((length) => [length, 'line']))],
-			['path', 'flow draw s2 long', { d: 'M178 110H264' }],
-			['rect', 'ghost', { x: 74, y: 74, width: 42, height: 72 }],
-			['rect', 'ghost', { x: 136, y: 74, width: 42, height: 72 }],
-			['rect', 'slot outline result s6', { x: 264, y: 44, width: 124, height: 132 }],
-			['path', 'flow', { d: 'M264 62H388' }],
+			['g', '', {}, note(12, 62, 42, 72, NOTE_LINES.map((length) => [length, 'line']))],
+			['path', 'flow draw s2 long', { d: 'M178 98H264' }],
+			['rect', 'ghost', { x: 74, y: 62, width: 42, height: 72 }],
+			['rect', 'ghost', { x: 136, y: 62, width: 42, height: 72 }],
+			['g', '', {}, [...pullRequest(264, 20, 124, 180), ...number(338, 24)]],
 			...[
 				[274, 's1', 's2'],
 				[336, 's3', 's4'],
@@ -250,14 +282,16 @@ export const skillFigures = {
 				[
 					...note(
 						x,
-						74,
+						62,
 						42,
 						72,
 						NOTE_LINES.map((length, index) => [length, `line inked ink s5 lag${index}`]),
 					),
-					['path', `check draw ${approve}`, { d: `M${x + 22} 133l4 4 8-9` }],
+					['path', `check draw ${approve}`, { d: `M${x + 22} 121l4 4 8-9` }],
 				],
 			]),
+			['path', 'flow', { d: 'M274 148H378' }],
+			...tag(274, 164, 's6'),
 		],
 	},
 	// The catalogue of notes; the two on the topic take ink and a copy of each comes out, outlined

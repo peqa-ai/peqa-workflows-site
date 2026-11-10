@@ -170,6 +170,13 @@
 	stroke: var(--color-accent);
 	stroke-width: var(--scene-stroke-strong);
 }
+/* The brand's button, filled with the accent: the one exception to outlines, in ui-design's
+   pricing page. */
+.skill-figure .accent-button {
+	fill: var(--color-accent);
+	stroke: var(--color-accent);
+	stroke-width: var(--scene-stroke);
+}
 /* The place a note left when it travelled on: its outline, empty, in the icon gray (4.3:1). */
 .skill-figure .ghost {
 	fill: none;
@@ -301,6 +308,13 @@
 		transform: translateY(var(--scene-scan));
 	}
 }
+/* A button taking the accent. */
+@keyframes scene-accent {
+	from {
+		fill: var(--scene-screen);
+		stroke: var(--color-text);
+	}
+}
 /* An approved note travelling to the right, from the place it leaves. */
 @keyframes scene-carry {
 	from {
@@ -357,7 +371,7 @@
    (data-motion="scroll"), or "waiting" and then "run" to play once in time where scroll
    timelines are missing (data-motion="time"). */
 @media screen and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
-	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .scan, .carry, .shift-in) {
+	.skill-figure[data-play] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .carry, .shift-in) {
 		animation-fill-mode: both;
 	}
 	/* A dash as long as the stroke and a longer gap, so the hidden stroke leaves no sliver. */
@@ -369,6 +383,7 @@
 	.skill-figure[data-play] .ink { animation-name: scene-ink; }
 	.skill-figure[data-play] .fill { animation-name: scene-fill; }
 	.skill-figure[data-play] .outline { animation-name: scene-outline; }
+	.skill-figure[data-play] .accent-fill { animation-name: scene-accent; }
 	.skill-figure[data-play] .scan { animation-name: scene-scan; }
 	.skill-figure[data-play] .carry { animation-name: scene-carry; }
 	.skill-figure[data-play] .shift-in { animation-name: scene-shift-in; }
@@ -379,7 +394,7 @@
 		.skill-figure[data-play='scroll'] {
 			view-timeline: --skill-figure block;
 		}
-		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .scan, .carry, .shift-in) {
+		.skill-figure[data-play='scroll'] :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .carry, .shift-in) {
 			animation-duration: auto;
 			animation-timing-function: linear;
 			animation-timeline: --skill-figure;
@@ -389,7 +404,7 @@
 	}
 
 	/* In time: the scene waits on its first frame, then plays its story once. */
-	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .scan, .carry, .shift-in) {
+	.skill-figure:is([data-play='waiting'], [data-play='run']) :is(.draw, .enter, .ink, .fill, .outline, .accent-fill, .scan, .carry, .shift-in) {
 		animation-duration: calc(var(--span, 1) * var(--scene-beat));
 		animation-timing-function: var(--scene-ease);
 		animation-delay: calc((var(--step, 0) + var(--lag, 0) / 4) * var(--scene-beat));
@@ -399,5 +414,16 @@
 	}
 	.skill-figure[data-play='waiting'] * {
 		animation-play-state: paused;
+	}
+}
+
+/* On paper the page is white (tokens.css), and the drawings stay dark: each scene prints on
+   the brand's background, with room around what it draws, and whole on one sheet. */
+@media print {
+	:is(.hero-scene, .skill-figure) {
+		break-inside: avoid;
+		box-sizing: border-box;
+		border: var(--space-4) solid var(--background);
+		background: var(--background);
 	}
 }

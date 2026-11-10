@@ -185,3 +185,22 @@ starlight-tabs {
 	--sl-search-corners: var(--radius);
 	--pagefind-ui-border-radius: var(--radius);
 }
+
+/* On paper (tokens.css turns the page's roles to ink) the dark surfaces stay as on screen: the
+   scenes, the install commands, the example requests, the code of the ledgers and the accent
+   button keep the screen's roles and print their own background. */
+@media print {
+	:is(.hero-scene, .skill-figure, .command pre, .ask, .ledger code, .sl-link-button.primary) {
+		--color-surface: var(--background);
+		--color-text: var(--foreground);
+		--color-text-muted: var(--muted);
+		--color-accent: var(--accent);
+		--color-border: var(--line);
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+	/* These two inherit their text color from the page around them: they take the role again. */
+	:is(.ask, .ledger code) {
+		color: var(--color-text);
+	}
+}

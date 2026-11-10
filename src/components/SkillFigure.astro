@@ -4,7 +4,7 @@
 // and play once in time as the scene comes into view otherwise (scene.css). The markup is the
 // final frame. The text beside it already says what the skill does, so assistive technology
 // skips the drawing.
-import { FIGURE_HEIGHT, FIGURE_WIDTH, skillFigures } from '../data/skill-figures.mjs';
+import { FIGURE_HEIGHT, FIGURE_MARGIN, FIGURE_WIDTH, skillFigures } from '../data/skill-figures.mjs';
 import '../styles/scene.css';
 
 interface Props {
@@ -13,6 +13,9 @@ interface Props {
 
 const figure = skillFigures[Astro.props.name];
 if (!figure) throw new Error(`src/data/skill-figures.mjs no tiene la escena de ${Astro.props.name}.`);
+// The window onto the drawing ends where its outermost strokes do, a unit past the margins
+// (half the widest outline), so every scene starts at its row's left edge and ends at its right.
+const viewBox = `${FIGURE_MARGIN - 1} 0 ${FIGURE_WIDTH - 2 * FIGURE_MARGIN + 2} ${FIGURE_HEIGHT}`;
 // Drawn strokes measure 1, so scene.css draws any of them with the same dash. The class goes
 // apart from the spread, where Astro would replace it with its scope class.
 const attributes = (className: string, attrs: Record<string, string | number>) => ({
@@ -21,7 +24,7 @@ const attributes = (className: string, attrs: Record<string, string | number>) =
 });
 ---
 
-<svg class="scene-art skill-figure" viewBox={`0 0 ${FIGURE_WIDTH} ${FIGURE_HEIGHT}`} aria-hidden="true" focusable="false">
+<svg class="scene-art skill-figure" viewBox={viewBox} aria-hidden="true" focusable="false">
 	{
 		figure.parts.map(([Tag, className, attrs, children]) => (
 			<Tag class={className} {...attributes(className, attrs)}>

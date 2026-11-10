@@ -12,7 +12,7 @@ const FIGURES = { file: 'src/data/skill-figures.mjs', tag: 'v0.17.0', item: 'esc
 
 /** Every part of a figure, groups and their children alike. */
 const partsOf = (parts) => parts.flatMap((part) => [part, ...partsOf(part[3] ?? [])]);
-const MOTION = ['draw', 'enter', 'ink', 'fill', 'outline', 'scan', 'carry', 'shift-in'];
+const MOTION = ['draw', 'enter', 'ink', 'fill', 'outline', 'accent-fill', 'scan', 'carry', 'shift-in'];
 const STEPS = ['s1', 's2', 's3', 's4', 's5', 's6'];
 
 describe('assertSkillCoverage', () => {
@@ -125,13 +125,26 @@ describe('skill scenes', () => {
 		}
 	});
 
-	test('the accent marks one result per scene, as an outline', () => {
+	test('the accent marks one result per scene: an outline, or the brand button in ui-design', () => {
 		for (const [name, { parts }] of Object.entries(skillFigures)) {
 			const classes = partsOf(parts).map(([, className]) => className.split(' '));
-			const results = classes.filter((list) => list.includes('result'));
-			// memoria-extraer ends in two copies, one per note on the topic.
-			assert.equal(results.length, name === 'memoria-extraer' ? 2 : 1, name);
-			assert.ok(!classes.some((list) => list.includes('accent')), `${name} fills nothing with the accent`);
+			const results = classes.filter((list) => list.includes('result')).length;
+			const buttons = classes.filter((list) => list.includes('accent-button')).length;
+			// memoria-extraer ends in two copies, one per note on the topic. ui-design's pricing
+			// page shows the brand's button, the one filled accent.
+			assert.equal(results, { 'memoria-extraer': 2, 'ui-design': 0 }[name] ?? 1, name);
+			assert.equal(buttons, name === 'ui-design' ? 1 : 0, name);
+			assert.ok(!classes.some((list) => list.includes('accent')), `${name} fills nothing else with the accent`);
+		}
+	});
+
+	test('the scenes that end in a pull request draw it as the hero does: header, number and tag', () => {
+		for (const name of ['dirige', 'memoria-guardar']) {
+			const all = partsOf(skillFigures[name].parts);
+			const hash = all.filter(([, className, attrs]) => className === 'ink-line' && /v12M.*h12M.*h12$/.test(attrs.d ?? ''));
+			const tags = all.filter(([tag, className, attrs]) => tag === 'rect' && className.includes('result') && attrs.height === 18);
+			assert.equal(hash.length, 1, `${name} number`);
+			assert.equal(tags.length, 1, `${name} tag`);
 		}
 	});
 
